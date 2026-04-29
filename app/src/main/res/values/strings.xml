@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">DnD Companion</string>
+
+    <string name="titulo_personaje">Tu personaje</string>
+    <string name="titulo_misiones_activas">Misiones activas</string>
+    <string name="titulo_misiones_disponibles">Misiones disponibles</string>
+    <string name="titulo_hechizos">Hechizos conocidos</string>
+    <string name="titulo_dados">Tirada de dados</string>
+
+    <string name="btn_aceptar">Aceptar</string>
+    <string name="btn_agregar">Nueva misión</string>
+    <string name="btn_tirar">Tirar dado</string>
+</resources>
