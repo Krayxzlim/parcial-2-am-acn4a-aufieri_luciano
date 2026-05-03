@@ -711,9 +711,7 @@
         </LinearLayout>
     </ScrollView>
 
-
     <!-- MENU FIJO -->
-
     <LinearLayout
         android:id="@+id/bottomMenu"
         android:orientation="horizontal"
@@ -728,96 +726,67 @@
 
         <!-- INICIO -->
         <LinearLayout
+            android:id="@+id/menuInicio"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-
-            <TextView
-                android:text="✦"
-                android:textColor="@color/dorado"
+            <TextView android:text="✦" android:textColor="@color/dorado"
                 android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:text="INICIO"
-                android:textColor="@color/dorado"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="INICIO" android:textColor="@color/dorado"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <!-- INVENTARIO -->
         <LinearLayout
+            android:id="@+id/menuInventario"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-
-            <TextView
-                android:text="🎒"
-                android:textColor="@color/texto_secundario"
+            <TextView android:text="🎒"
                 android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:text="INVENTARIO"
-                android:textColor="@color/texto_secundario"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="INVENTARIO" android:textColor="@color/texto_secundario"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <!-- NOTAS -->
         <LinearLayout
+            android:id="@+id/menuNotas"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-
-            <TextView
-                android:text="📖"
-                android:textColor="@color/texto_secundario"
+            <TextView android:text="📖"
                 android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:text="NOTAS"
-                android:textColor="@color/texto_secundario"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="NOTAS" android:textColor="@color/texto_secundario"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <!-- AJUSTES -->
         <LinearLayout
+            android:id="@+id/menuAjustes"
             android:orientation="vertical"
             android:gravity="center"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-
-            <TextView
-                android:text="⚙"
-                android:textColor="@color/texto_secundario"
+            <TextView android:text="⚙" android:textColor="@color/texto_secundario"
                 android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:text="AJUSTES"
-                android:textColor="@color/texto_secundario"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="AJUSTES" android:textColor="@color/texto_secundario"
                 android:textSize="10sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
