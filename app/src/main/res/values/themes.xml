@@ -1,9 +1,23 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.DndCompanion" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Tema principal de la app -->
+    <style name="Theme.DndCompanion" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/dorado</item>
+        <item name="colorPrimaryVariant">@color/dorado_borde</item>
+        <item name="colorOnPrimary">@color/fondo</item>
+        <item name="colorSurface">@color/seccion_fondo</item>
+        <item name="android:windowBackground">@color/fondo</item>
     </style>
 
-    <style name="Theme.DndCompanion" parent="Base.Theme.DndCompanion" />
+    <!-- Diálogo con estética oscura de la app -->
+    <style name="DialogoOscuro" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.7</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
 </resources>
