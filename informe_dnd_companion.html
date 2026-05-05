@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D&D Companion — Informe de Pantallas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --gold:       #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-dim:   #5A4A20;
+  --bg:         #0D0D14;
+  --bg-sec:     #16161F;
+  --bg-stat:    #1E1E2A;
+  --bg-btn:     #1E1E2A;
+  --border:     #2A2A3A;
+  --text:       #E8E0D0;
+  --text-sub:   #8A8070;
+  --truco-bg:   #2A3A2A; --truco-txt: #6DBF6D;
+  --n1-bg:      #1E2A3A; --n1-txt:    #6DA8BF;
+  --n2-bg:      #2A1E3A; --n2-txt:    #A06DBF;
+  --n3-bg:      #3A1E1E; --n3-txt:    #BF6D6D;
+  --tomo-bg:    #1A1530;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── Grain ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0; opacity:.4;
+}
+/* ── Gold top bar ── */
+body::after {
+  content:'';
+  position:fixed; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--gold-light),var(--gold),transparent);
+  z-index:200;
+}
+
+.wrap { position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:0 28px; }
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  text-align:center;
+  padding:60px 24px 48px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.hero::before {
+  content:'✦  ✦  ✦';
+  display:block;
+  color:var(--gold-dim);
+  font-size:11px;
+  letter-spacing:.4em;
+  margin-bottom:20px;
+}
+.hero-title {
+  font-family:'Cinzel',serif;
+  font-size:clamp(32px,5vw,58px);
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:.04em;
+  line-height:1.1;
+  text-shadow:0 0 40px rgba(201,168,76,.25);
+}
+.hero-sub {
+  font-family:'Cinzel',serif;
+  font-size:clamp(10px,1.4vw,13px);
+  color:var(--text-sub);
+  letter-spacing:.22em;
+  margin-top:8px;
+}
+.hero-meta {
+  margin-top:20px;
+  color:var(--text-sub);
+  font-size:14px;
+  font-style:italic;
+}
+.hero-rule {
+  width:100px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:24px auto 0;
+}
+.nav-pills {
+  display:flex; justify-content:center; gap:10px;
+  padding:28px 0 0; flex-wrap:wrap;
+}
+.nav-pill {
+  font-family:'Cinzel',serif; font-size:10px;
+  letter-spacing:.12em; padding:7px 18px;
+  border:1px solid var(--border); border-radius:2px;
+  color:var(--text-sub); cursor:pointer;
+  background:transparent; transition:all .2s;
+  text-decoration:none;
+}
+.nav-pill:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,.06); }
+
+/* ═══════════════════════════════════════
+   SECTION TITLES
+═══════════════════════════════════════ */
+.sec-header { text-align:center; padding:56px 0 36px; }
+.sec-num {
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--gold-dim); letter-spacing:.2em;
+  display:block; margin-bottom:6px;
+}
+.sec-title {
+  font-family:'Cinzel',serif;
+  font-size:clamp(20px,3.5vw,30px);
+  font-weight:600; color:var(--gold); letter-spacing:.04em;
+}
+.sec-desc {
+  margin-top:10px; color:var(--text-sub);
+  font-style:italic; font-size:15px;
+  max-width:540px; margin-left:auto; margin-right:auto;
+}
+.ornament {
+  display:flex; align-items:center; gap:10px;
+  margin-top:20px; justify-content:center;
+}
+.orn-line { flex:1; max-width:70px; height:1px; }
+.orn-l { background:linear-gradient(90deg,transparent,var(--gold-dim)); }
+.orn-r { background:linear-gradient(90deg,var(--gold-dim),transparent); }
+.orn-d { color:var(--gold); font-size:9px; }
+
+/* ═══════════════════════════════════════
+   INTRO CARDS
+═══════════════════════════════════════ */
+.intro-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:14px; padding-bottom:48px;
+}
+.icard {
+  background:var(--bg-sec); border:1px solid var(--border);
+  border-top:2px solid var(--gold-dim); padding:18px; border-radius:2px;
+}
+.icard-ico { font-size:20px; margin-bottom:8px; }
+.icard-title {
+  font-family:'Cinzel',serif; font-size:10px;
+  letter-spacing:.12em; color:var(--gold); margin-bottom:6px;
+}
+.icard-text { font-size:13.5px; color:var(--text-sub); line-height:1.6; }
+
+/* ═══════════════════════════════════════
+   MAIN LAYOUT — phone + info
+═══════════════════════════════════════ */
+.screen-block { padding-bottom:64px; border-bottom:1px solid var(--border); }
+.screen-block:last-of-type { border-bottom:none; }
+
+.main-layout {
+  display:grid;
+  grid-template-columns:210px 1fr;
+  gap:52px; align-items:start;
+}
+.main-layout.rev { grid-template-columns:1fr 210px; }
+.main-layout.rev .phone-col { order:2; }
+.main-layout.rev .info-col  { order:1; }
+
+/* ═══════════════════════════════════════
+   PHONE MOCKUP — exact app replica
+═══════════════════════════════════════ */
+.phone-col { position:sticky; top:20px; }
+
+.phone {
+  width:210px;
+  border-radius:26px;
+  border:2px solid #2E2448;
+  background:#0D0D14;
+  overflow:hidden;
+  box-shadow:0 0 0 5px rgba(46,36,72,.4), 0 20px 60px rgba(0,0,0,.7);
+  position:relative;
+}
+.phone::before {
+  content:'';
+  position:absolute; top:10px; left:50%;
+  transform:translateX(-50%);
+  width:52px; height:4px;
+  background:#1A1230; border-radius:3px; z-index:10;
+}
+
+/* ── App shell ── */
+.app { width:100%; background:#0D0D14; font-family:sans-serif; }
+
+/* Header */
+.app-header {
+  background:linear-gradient(180deg,#1A1030 0%,#0D0D14 100%);
+  padding:18px 6px 6px; text-align:center;
+  border-bottom:1px solid var(--gold);
+  position:relative;
+}
+/* gold ornament lines */
+.app-header::before,.app-header::after {
+  content:''; position:absolute; left:8px; right:8px; height:1px;
+}
+.app-header::before { top:6px; background:linear-gradient(90deg,transparent,var(--gold-dim),transparent); }
+.h-title { color:var(--gold); font-family:'Cinzel',serif; font-size:11px; font-weight:700; letter-spacing:.04em; }
+.h-sub   { color:var(--gold-light); font-size:6px; letter-spacing:.1em; margin-top:1px; }
+
+/* Generic section */
+.a-sec {
+  margin:4px; border-radius:4px;
+  border:1px solid var(--gold-dim);
+  overflow:hidden; position:relative;
+  background:var(--bg-sec);
+}
+/* corner ornaments via pseudo — simplified */
+.a-sec::before,.a-sec::after {
+  content:'';
+  position:absolute; width:8px; height:8px;
+  border-color:var(--gold); border-style:solid;
+}
+.a-sec::before { top:0; left:0;  border-width:1px 0 0 1px; }
+.a-sec::after  { top:0; right:0; border-width:1px 1px 0 0; }
+
+.a-sec-inner { padding:5px 7px; }
+.a-sec-title {
+  color:var(--gold); font-size:7.5px; font-weight:700;
+  letter-spacing:.06em; display:flex; align-items:center;
+  justify-content:space-between; gap:4px;
+}
+.a-sep { height:1px; background:var(--border); margin:4px 0; }
+.a-sep-gold { height:1px; background:var(--gold-dim); margin:3px 0; }
+
+/* Rows */
+.a-row {
+  display:flex; align-items:center; gap:4px;
+  padding:2px 0; border-bottom:1px solid var(--border);
+  font-size:7px;
+}
+.a-row:last-child { border-bottom:none; }
+.a-row-text { color:var(--text); flex:1; font-size:7.5px; }
+.a-row-sub  { color:var(--text-sub); font-size:6px; }
+
+/* Badge */
+.a-badge { background:var(--bg-stat); color:var(--gold); font-size:5.5px; padding:1px 4px; border-radius:2px; white-space:nowrap; letter-spacing:.04em; }
+.a-btn { background:var(--bg-stat); color:var(--gold); font-size:6px; padding:2px 5px; border-radius:2px; white-space:nowrap; border:1px solid var(--gold-dim); }
+
+/* Character card */
+.char-grid { display:flex; gap:5px; }
+.char-avatar {
+  width:30px; height:44px; flex-shrink:0;
+  border:1px solid var(--gold);
+  border-radius:3px; overflow:hidden;
+  background:var(--bg-stat);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--gold); font-size:16px;
+  position:relative;
+}
+/* corner lines on avatar */
+.char-avatar::before,.char-avatar::after {
+  content:''; position:absolute; width:5px; height:5px;
+}
+.char-avatar::before { top:0; left:0; border-top:1px solid var(--gold); border-left:1px solid var(--gold); }
+.char-avatar::after  { bottom:0; right:0; border-bottom:1px solid var(--gold); border-right:1px solid var(--gold); }
+.char-info { flex:1; min-width:0; }
+.char-name { color:var(--text); font-size:8.5px; font-weight:700; }
+.char-sub  { color:var(--text-sub); font-size:6px; line-height:1.5; }
+.char-stats { display:flex; gap:2px; margin-top:3px; }
+.stat-box {
+  flex:1; background:#0D0D14; border-radius:3px; padding:2px;
+  text-align:center; border:1px solid var(--gold-dim);
+}
+.stat-box .sl { color:var(--gold-light); font-size:5px; display:block; }
+.stat-box .sv { color:var(--text); font-size:8.5px; font-weight:700; display:block; }
+.attr-row { display:flex; gap:1px; margin-top:4px; }
+.attr { flex:1; text-align:center; }
+.attr .al { color:var(--gold-light); font-size:5px; }
+.attr .av { color:var(--text); font-size:7px; font-weight:700; }
+.attr .am { color:var(--text-sub); font-size:5px; }
+
+/* Spells */
+.spell-row { display:flex; align-items:center; gap:3px; padding:2px 0; border-bottom:1px solid var(--border); }
+.spell-row:last-child { border-bottom:none; }
+.sp-badge { font-size:5px; padding:1.5px 3px; border-radius:2px; white-space:nowrap; }
+.sp-t  { background:var(--truco-bg); color:var(--truco-txt); }
+.sp-n1 { background:var(--n1-bg);    color:var(--n1-txt); }
+.sp-n2 { background:var(--n2-bg);    color:var(--n2-txt); }
+.sp-n3 { background:var(--n3-bg);    color:var(--n3-txt); }
+.sp-name { color:var(--text); font-size:7px; flex:1; }
+.sp-arrow { color:var(--gold); font-size:9px; }
+.tomo {
+  width:52px; flex-shrink:0;
+  background:var(--tomo-bg);
+  border:1px solid var(--gold-dim);
+  border-radius:4px;
+  padding:6px 4px;
+  text-align:center;
+}
+.tomo-ico  { font-size:22px; }
+.tomo-dots { color:var(--gold); font-size:6px; margin-top:2px; }
+.tomo-lbl  { color:var(--gold-light); font-size:5.5px; margin-top:2px; line-height:1.4; }
+
+/* Dice */
+.dice-grid { display:flex; gap:2px; margin-top:2px; }
+.die {
+  flex:1; background:var(--bg-stat); border-radius:3px;
+  padding:3px 1px; text-align:center;
+  border:1px solid var(--border); cursor:pointer;
+}
+.die .ds { color:var(--text-sub); font-size:5.5px; }
+.die .dl { color:var(--text-sub); font-size:5px; display:block; margin-top:1px; }
+.die.d20 .ds, .die.d20 .dl { color:var(--gold); }
+.result-panel {
+  background:var(--bg-stat); border:1px solid var(--border);
+  border-radius:3px; padding:4px; text-align:center; margin-top:2px;
+}
+.result-num { color:var(--gold); font-size:18px; font-weight:700; font-family:'Cinzel',serif; display:block; }
+.result-lbl { color:var(--text-sub); font-size:5.5px; }
+.wide-btn {
+  background:var(--bg-stat); color:var(--gold);
+  font-size:6px; padding:3px; border:1px solid var(--gold-dim);
+  text-align:center; border-radius:3px; margin-top:2px; width:100%;
+}
+
+/* Mission rows */
+.mission-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
+.mission-row:last-child { border-bottom:none; }
+.mission-ico { font-size:12px; flex-shrink:0; }
+.mission-info { flex:1; min-width:0; }
+.mission-name { color:var(--text); font-size:7.5px; font-weight:700; display:block; }
+.mission-desc { color:var(--text-sub); font-size:6px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mission-reward { color:var(--gold-light); font-size:6px; display:block; }
+
+/* Progress bar */
+.prog { height:5px; background:var(--border); border-radius:2px; margin-top:3px; overflow:hidden; }
+.prog-fill { height:100%; background:var(--gold); border-radius:2px; }
+
+/* Coins */
+.coins { display:flex; gap:2px; margin-top:3px; }
+.coin { flex:1; text-align:center; }
+.coin .cl { color:var(--text-sub); font-size:6px; display:block; }
+.coin .cv { color:var(--text); font-size:9px; font-weight:700; display:block; }
+.coin .cv.go { color:var(--gold); }
+
+/* Inv rows */
+.inv-row { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid var(--border); }
+.inv-row:last-child { border-bottom:none; }
+
+/* Note cards */
+.nota-card { background:#0D0D14; border-radius:3px; padding:4px; margin-bottom:3px; }
+.nota-card:last-child { margin-bottom:0; }
+.nota-head { display:flex; justify-content:space-between; align-items:baseline; }
+.nota-title { color:var(--gold-light); font-size:7px; font-weight:700; }
+.nota-date  { color:var(--text-sub); font-size:6px; }
+.nota-text  { color:var(--text); font-size:6.5px; margin-top:2px; line-height:1.4; }
+
+/* NPC rows */
+.npc-row { display:flex; align-items:center; gap:5px; padding:3px 0; border-bottom:1px solid var(--border); }
+.npc-row:last-child { border-bottom:none; }
+.dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.dot-g { background:#1D9E75; }
+.dot-r { background:#E24B4A; }
+
+/* EditText */
+.edit-area {
+  background:#0D0D14; border:1px solid var(--border);
+  border-radius:3px; padding:5px; color:var(--text-sub);
+  font-size:7px; min-height:22px; margin-top:2px;
+}
+
+/* Nav */
+.app-nav {
+  display:flex; background:var(--bg-sec);
+  border-top:1px solid var(--border); padding:4px 0 2px;
+}
+.nav-item { flex:1; text-align:center; font-size:6px; line-height:1.5; cursor:pointer; }
+.nav-item.on { color:var(--gold); }
+.nav-item.off { color:var(--text-sub); }
+
+/* link footer in phone */
+.ver-link { color:var(--gold-light); font-size:6px; text-align:center; padding-top:4px; display:block; }
+
+/* ═══════════════════════════════════════
+   INFO COLUMN
+═══════════════════════════════════════ */
+.info-col {}
+.screen-label { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+.screen-tag {
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:#0D0D14; background:var(--gold-dim);
+  padding:2px 10px; border-radius:2px; letter-spacing:.08em;
+}
+.screen-name { font-family:'Cinzel',serif; font-size:22px; font-weight:600; color:var(--gold); }
+.screen-intro {
+  color:var(--text-sub); font-style:italic; font-size:15px;
+  line-height:1.7; margin-bottom:24px;
+  padding-left:14px; border-left:2px solid var(--gold-dim);
+}
+
+/* Feature cards */
+.features { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+.feat {
+  background:var(--bg-sec); border:1px solid var(--border);
+  border-radius:3px; overflow:hidden; transition:border-color .2s;
+}
+.feat:hover { border-color:var(--gold-dim); }
+.feat-head {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:#0D0D14;
+  border-bottom:1px solid var(--border);
+}
+.feat-ico {
+  width:26px; height:26px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; background:rgba(201,168,76,.08);
+  border:1px solid var(--gold-dim); border-radius:2px;
+}
+.feat-name { font-family:'Cinzel',serif; font-size:11px; color:var(--gold); letter-spacing:.05em; }
+.feat-kind {
+  margin-left:auto; font-family:'JetBrains Mono',monospace;
+  font-size:9px; color:var(--text-sub); letter-spacing:.06em;
+}
+.feat-body { padding:12px 14px; }
+.feat-body p { font-size:14px; color:var(--text-sub); line-height:1.65; margin-bottom:8px; }
+.feat-body p:last-child { margin-bottom:0; }
+
+/* Flow */
+.flow-title {
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  color:var(--gold-dim); margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.flow-title::after { content:''; flex:1; height:1px; background:var(--border); }
+.flow-row { display:flex; align-items:center; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+.f-step { background:var(--bg-stat); border:1px solid var(--border); border-radius:3px; padding:5px 10px; font-size:12px; color:var(--text); }
+.f-step.trg { border-color:var(--gold-dim); color:var(--gold); background:rgba(201,168,76,.07); }
+.f-step.ok  { border-color:#1D6E4E; color:#5DCAA5; background:rgba(29,158,117,.07); }
+.f-step.dlg { border-color:#534AB7; color:#AFA9EC; background:rgba(127,119,221,.07); }
+.f-arr { color:var(--text-sub); font-size:13px; }
+
+/* Tags */
+.tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.tag { font-family:'JetBrains Mono',monospace; font-size:9.5px; padding:2px 7px; border-radius:2px; }
+.t-anim  { background:rgba(239,159,39,.09);  color:#BA7517; border:1px solid rgba(239,159,39,.25); }
+.t-ui    { background:rgba(55,138,221,.09);  color:#2B6CB0; border:1px solid rgba(55,138,221,.25); }
+.t-data  { background:rgba(29,158,117,.09);  color:#0F6E56; border:1px solid rgba(29,158,117,.25); }
+.t-dlg   { background:rgba(127,119,221,.09); color:#534AB7; border:1px solid rgba(127,119,221,.25); }
+
+/* ═══════════════════════════════════════
+   GLOBAL FLOW TABLE
+═══════════════════════════════════════ */
+.gf-wrap {
+  background:var(--bg-sec); border:1px solid var(--border);
+  border-radius:4px; padding:28px; margin-bottom:56px;
+}
+.gf-title {
+  font-family:'Cinzel',serif; font-size:13px; color:var(--gold);
+  letter-spacing:.1em; text-align:center; margin-bottom:24px;
+}
+.gf-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:3px; overflow:hidden;
+}
+.gf-col { background:var(--bg-stat); padding:18px 14px; }
+.gf-col-title {
+  font-family:'Cinzel',serif; font-size:11px; color:var(--gold);
+  margin-bottom:12px; display:flex; align-items:center; gap:7px;
+}
+.gf-num {
+  font-family:'JetBrains Mono',monospace; font-size:9px;
+  color:var(--bg); background:var(--gold-dim); padding:1px 6px; border-radius:2px;
+}
+.gf-item { display:flex; gap:7px; align-items:baseline; margin-bottom:7px; font-size:13px; color:var(--text-sub); }
+.gf-dot { width:4px; height:4px; border-radius:50%; background:var(--gold-dim); flex-shrink:0; margin-top:7px; }
+.gf-nav {
+  display:flex; justify-content:center; align-items:center;
+  gap:10px; margin-top:20px; padding-top:18px;
+  border-top:1px solid var(--border); flex-wrap:wrap;
+}
+.gf-ni { font-family:'Cinzel',serif; font-size:10px; color:var(--gold); text-align:center; letter-spacing:.06em; }
+.gf-arr { color:var(--text-sub); font-size:18px; }
+.gf-note { font-size:12px; color:var(--text-sub); font-style:italic; }
+
+/* ═══════════════════════════════════════
+   PALETTE
+═══════════════════════════════════════ */
+.pal-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:8px; margin-bottom:48px;
+}
+.pal-item { border-radius:3px; overflow:hidden; border:1px solid var(--border); }
+.pal-sw { height:44px; }
+.pal-info { padding:7px 9px; background:var(--bg-sec); }
+.pal-name { font-size:12px; color:var(--text); font-weight:600; }
+.pal-hex  { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-sub); }
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+.footer { border-top:1px solid var(--border); padding:36px 0; text-align:center; }
+.footer p { font-size:13px; color:var(--text-sub); margin-top:6px; }
+.footer p:first-child { color:var(--gold-dim); font-size:13px; letter-spacing:.3em; }
+
+/* ═══════════════════════════════════════
+   REVEAL
+═══════════════════════════════════════ */
+.reveal { opacity:0; transform:translateY(16px); transition:opacity .5s,transform .5s; }
+.reveal.vis { opacity:1; transform:none; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:740px){
+  .main-layout,.main-layout.rev { grid-template-columns:1fr; }
+  .main-layout.rev .phone-col { order:0; }
+  .phone-col { position:static; display:flex; justify-content:center; margin-bottom:32px; }
+  .gf-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ HERO ════════════════ -->
+<div class="hero wrap">
+  <h1 class="hero-title">D&amp;D Companion</h1>
+  <p class="hero-sub">INFORME DE DESCRIPCIÓN DE PANTALLAS · PARCIAL 1</p>
+  <p class="hero-meta">Aplicación móvil Android nativa · Java · D&amp;D 5ª Edición<br>
+    Repositorio: <a href="https://github.com/Krayxzlim/parcial-1-am-acn4a-aufieri_luciano" style="color:var(--gold-light)">parcial-1-am-acn4a-aufieri_luciano</a></p>
+  <div class="hero-rule"></div>
+  <nav class="nav-pills">
+    <a class="nav-pill" href="#intro">Visión General</a>
+    <a class="nav-pill" href="#p1">Pantalla Inicio</a>
+    <a class="nav-pill" href="#p2">Inventario</a>
+    <a class="nav-pill" href="#p3">Notas</a>
+    <a class="nav-pill" href="#flujo">Flujo Global</a>
+  </nav>
+</div>
+
+<!-- ════════════════ INTRO ════════════════ -->
+<div id="intro" class="wrap">
+  <div class="sec-header reveal">
+    <span class="sec-num">00 — VISIÓN GENERAL</span>
+    <h2 class="sec-title">La Aplicación</h2>
+    <p class="sec-desc">Companion para sesiones de Dungeons &amp; Dragons 5e. Gestión de personaje, misiones, hechizos, inventario y notas desde un único lugar.</p>
+    <div class="ornament"><div class="orn-line orn-l"></div><span class="orn-d">✦</span><div class="orn-line orn-r"></div></div>
+  </div>
+
+  <div class="intro-grid reveal">
+    <div class="icard"><div class="icard-ico">🎨</div><div class="icard-title">Identidad Visual</div><p class="icard-text">Fondo oscuro #0D0D14, acento dorado #C9A84C, tipografía Cinzel y serif. Esquinas ornamentales en cada tarjeta. Textura de grano sobre toda la app.</p></div>
+    <div class="icard"><div class="icard-ico">⚙️</div><div class="icard-title">Tecnología</div><p class="icard-text">Android nativo Java. ConstraintLayout + LinearLayout dinámico. ViewPropertyAnimator para misiones. ObjectAnimator para dados.</p></div>
+    <div class="icard"><div class="icard-ico">🧭</div><div class="icard-title">Navegación</div><p class="icard-text">Barra inferior fija con 4 ítems: Inicio, Inventario, Notas, Ajustes. Ítem activo en dorado. Transición fade_in/fade_out entre Activities.</p></div>
+    <div class="icard"><div class="icard-ico">📐</div><div class="icard-title">Estructura</div><p class="icard-text">3 Activities principales (MainActivity, InventarioActivity, NotasActivity). Strings, colors y dimens en resources. Conventional commits en Git.</p></div>
+  </div>
+
+  <div class="sec-header reveal" style="padding-top:0;padding-bottom:16px">
+    <span class="sec-num">PALETA DE COLORES</span>
+  </div>
+  <div class="pal-grid reveal">
+    <div class="pal-item"><div class="pal-sw" style="background:#0D0D14"></div><div class="pal-info"><div class="pal-name">Fondo</div><div class="pal-hex">#0D0D14</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#16161F"></div><div class="pal-info"><div class="pal-name">Sección</div><div class="pal-hex">#16161F</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#1E1E2A"></div><div class="pal-info"><div class="pal-name">Stat / Botón</div><div class="pal-hex">#1E1E2A</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#C9A84C"></div><div class="pal-info"><div class="pal-name">Dorado</div><div class="pal-hex">#C9A84C</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#E8C97A"></div><div class="pal-info"><div class="pal-name">Dorado claro</div><div class="pal-hex">#E8C97A</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#5A4A20"></div><div class="pal-info"><div class="pal-name">Dorado borde</div><div class="pal-hex">#5A4A20</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#E8E0D0"></div><div class="pal-info"><div class="pal-name">Texto</div><div class="pal-hex">#E8E0D0</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#8A8070"></div><div class="pal-info"><div class="pal-name">Texto sub.</div><div class="pal-hex">#8A8070</div></div></div>
+    <div class="pal-item"><div class="pal-sw" style="background:#2A2A3A"></div><div class="pal-info"><div class="pal-name">Borde</div><div class="pal-hex">#2A2A3A</div></div></div>
+  </div>
+</div>
+
+<!-- ════════════════ PANTALLA 1 ════════════════ -->
+<div id="p1" class="wrap screen-block">
+  <div class="sec-header reveal">
+    <span class="sec-num">01 — PANTALLA PRINCIPAL</span>
+    <h2 class="sec-title">Inicio</h2>
+    <p class="sec-desc">Centro de mando: personaje, misiones activas, misiones disponibles, hechizos y tirada de dados en un único scroll.</p>
+    <div class="ornament"><div class="orn-line orn-l"></div><span class="orn-d">✦</span><div class="orn-line orn-r"></div></div>
+  </div>
+
+  <div class="main-layout reveal">
+    <!-- PHONE -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="app">
+          <div class="app-header">
+            <div class="h-title">D&amp;D Companion</div>
+            <div class="h-sub">TU AVENTURA, SIEMPRE CONTIGO</div>
+          </div>
+          <!-- Personaje -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">TU PERSONAJE <span style="color:var(--gold);font-size:9px">›</span></div>
+              <div class="a-sep"></div>
+              <div class="char-grid">
+                <div class="char-avatar">⚔</div>
+                <div class="char-info">
+                  <div class="char-name">Arannis</div>
+                  <div class="char-sub">Elfo de los Bosques<br>Mago Nivel 5<br>Caótico Neutral</div>
+                  <div class="char-stats">
+                    <div class="stat-box"><span class="sl">CA</span><span class="sv">13</span></div>
+                    <div class="stat-box"><span class="sl">PG</span><span class="sv">31/31</span></div>
+                    <div class="stat-box"><span class="sl">INIC.</span><span class="sv">+2</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="attr-row" style="margin-top:4px">
+                <div class="attr"><div class="al">FUE</div><div class="av">8</div><div class="am">(-1)</div></div>
+                <div class="attr"><div class="al">DES</div><div class="av">14</div><div class="am">(+2)</div></div>
+                <div class="attr"><div class="al">CON</div><div class="av">14</div><div class="am">(+2)</div></div>
+                <div class="attr"><div class="al">INT</div><div class="av">18</div><div class="am">(+4)</div></div>
+                <div class="attr"><div class="al">SAB</div><div class="av">12</div><div class="am">(+1)</div></div>
+                <div class="attr"><div class="al">CAR</div><div class="av">10</div><div class="am">(+0)</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Misiones activas -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title"><span>✦ MISIONES ACTIVAS</span><span style="color:var(--gold);font-size:9px">›</span></div>
+              <div class="a-sep"></div>
+              <span class="ver-link">VER TODAS LAS MISIONES ›</span>
+            </div>
+          </div>
+          <!-- Misiones disponibles -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title"><span>✦ MISIONES DISPONIBLES</span><span style="color:var(--gold);font-size:9px">›</span></div>
+              <div class="a-sep"></div>
+              <div class="mission-row">
+                <div class="mission-ico">📜</div>
+                <div class="mission-info">
+                  <span class="mission-name">Entrega especial</span>
+                  <span class="mission-desc">Entrega un paquete sellado al Gremio...</span>
+                  <span class="mission-reward">Recompensa: 100 XP</span>
+                </div>
+                <div class="a-btn">ACEPTAR</div>
+              </div>
+              <div class="mission-row">
+                <div class="mission-ico">📜</div>
+                <div class="mission-info">
+                  <span class="mission-name">Caza de bandidos</span>
+                  <span class="mission-desc">Elimina a los bandidos del norte.</span>
+                  <span class="mission-reward">Recompensa: 200 XP</span>
+                </div>
+                <div class="a-btn">ACEPTAR</div>
+              </div>
+              <div style="margin-top:4px">
+                <div class="wide-btn">＋  NUEVA MISIÓN</div>
+              </div>
+            </div>
+          </div>
+          <!-- Hechizos -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title"><span>✦ HECHIZOS CONOCIDOS</span><span style="color:var(--gold);font-size:9px">›</span></div>
+              <div class="a-sep"></div>
+              <div style="display:flex;gap:4px">
+                <div style="flex:1">
+                  <div class="spell-row"><span class="sp-badge sp-t">TRUCO</span><span class="sp-name">Descarga de Escarcha</span><span class="sp-arrow">›</span></div>
+                  <div class="spell-row"><span class="sp-badge sp-t">TRUCO</span><span class="sp-name">Mano Mágica</span><span class="sp-arrow">›</span></div>
+                  <div class="spell-row"><span class="sp-badge sp-n1">NIVEL 1</span><span class="sp-name">Escudo</span><span class="sp-arrow">›</span></div>
+                  <div class="spell-row"><span class="sp-badge sp-n1">NIVEL 1</span><span class="sp-name">Misiles Mágicos</span><span class="sp-arrow">›</span></div>
+                  <div class="spell-row"><span class="sp-badge sp-n2">NIVEL 2</span><span class="sp-name">Armadura de Magia</span><span class="sp-arrow">›</span></div>
+                  <div class="spell-row"><span class="sp-badge sp-n3">NIVEL 3</span><span class="sp-name">Bola de Fuego</span><span class="sp-arrow">›</span></div>
+                </div>
+                <div class="tomo">
+                  <div class="tomo-ico">📖</div>
+                  <div class="tomo-dots">✦ ✦ ✦</div>
+                  <div class="tomo-lbl">Tomo<br>Arcano</div>
+                </div>
+              </div>
+              <span class="ver-link" style="text-align:right;display:block;padding-top:3px">VER TODOS (12) ›</span>
+            </div>
+          </div>
+          <!-- Dados -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title"><span>✦ TIRADA DE DADOS</span><span style="color:var(--gold);font-size:9px">›</span></div>
+              <div class="a-sep"></div>
+              <div style="display:flex;gap:4px">
+                <div style="flex:1">
+                  <div class="dice-grid">
+                    <div class="die"><span class="ds">▲</span><span class="dl">d4</span></div>
+                    <div class="die"><span class="ds">⬡</span><span class="dl">d6</span></div>
+                    <div class="die"><span class="ds">◆</span><span class="dl">d8</span></div>
+                    <div class="die"><span class="ds">⬟</span><span class="dl">d10</span></div>
+                    <div class="die"><span class="ds">⬡</span><span class="dl">d12</span></div>
+                    <div class="die d20"><span class="ds">⬠</span><span class="dl">d20</span></div>
+                  </div>
+                  <div class="wide-btn" style="margin-top:3px">🎲 TIRAR DADO ALEATORIO</div>
+                </div>
+                <div style="width:52px;flex-shrink:0">
+                  <div class="result-panel">
+                    <span class="result-lbl">RESULTADO</span>
+                    <span class="result-num">15</span>
+                    <span class="result-lbl">(d20) ✦</span>
+                  </div>
+                  <div class="wide-btn" style="margin-top:2px;font-size:5.5px">🕐 HISTORIAL</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-nav">
+            <div class="nav-item on">✦<br>INICIO</div>
+            <div class="nav-item off">🎒<br>INVENTARIO</div>
+            <div class="nav-item off">📖<br>NOTAS</div>
+            <div class="nav-item off">⚙<br>AJUSTES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-col">
+      <div class="screen-label">
+        <span class="screen-tag">PANTALLA 01</span>
+        <span class="screen-name">MainActivity</span>
+      </div>
+      <p class="screen-intro">Pantalla principal de la app. Vista scrolleable con 5 secciones que concentran toda la información activa del personaje. Es la única pantalla generada mayoritariamente por código Java en tiempo de ejecución.</p>
+
+      <div class="features">
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">⚔</div><span class="feat-name">Tu Personaje</span><span class="feat-kind">ESTÁTICA</span></div>
+          <div class="feat-body">
+            <p>Muestra avatar seleccionable desde galería (ActivityResultLauncher + GetContent), nombre, raza, clase/nivel y alineación. Tres fichas de estadística con drawables personalizados (shield_bg, heart_bg, light_bg). Seis atributos con modificador calculado en columnas de igual peso.</p>
+            <div class="tags"><span class="tag t-ui">FrameLayout con esquinas</span><span class="tag t-ui">ImageView clickeable</span><span class="tag t-ui">Drawables vectoriales</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">⚔</div><span class="feat-name">Misiones Activas</span><span class="feat-kind">DINÁMICA</span></div>
+          <div class="feat-body">
+            <p>Lista vacía al inicio, generada por código (<code>layoutActivas</code>). Las misiones se agregan al aceptarlas desde la sección de disponibles, con animación de entrada (alpha 0→1 + translationX -200→0, 250ms).</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO</div>
+              <div class="flow-row"><span class="f-step trg">Misión aceptada</span><span class="f-arr">→</span><span class="f-step">Animación entrada 250ms</span><span class="f-arr">→</span><span class="f-step ok">Badge "EN CURSO"</span></div>
+            </div>
+            <div class="tags"><span class="tag t-anim">ViewPropertyAnimator</span><span class="tag t-data">addView en layoutActivas</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">📜</div><span class="feat-name">Misiones Disponibles</span><span class="feat-kind">INTERACTIVA</span></div>
+          <div class="feat-body">
+            <p>Cada misión vive dentro de un <strong>wrapper LinearLayout</strong> que agrupa el separador y el ítem. Al presionar ACEPTAR: el botón se deshabilita inmediatamente (anti doble tap), se anima la salida (alpha→0 + translationX +200, 250ms), luego en <code>wrapper.post()</code> se hace <code>removeView</code> — evitando el crash del renderer — y se elimina el separador del nuevo primer elemento si corresponde.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO ACEPTAR MISIÓN</div>
+              <div class="flow-row"><span class="f-step trg">Tap ACEPTAR</span><span class="f-arr">→</span><span class="f-step">btn.setEnabled(false)</span><span class="f-arr">→</span><span class="f-step">Salida 250ms</span><span class="f-arr">→</span><span class="f-step">wrapper.post removeView</span><span class="f-arr">→</span><span class="f-step ok">Aparece en Activas</span></div>
+              <div class="flow-row" style="margin-top:6px"><span class="f-step trg">Tap + NUEVA MISIÓN</span><span class="f-arr">→</span><span class="f-step ok">Nuevo wrapper agregado al final</span></div>
+            </div>
+            <div class="tags"><span class="tag t-anim">alpha + translationX</span><span class="tag t-data">wrapper pattern</span><span class="tag t-ui">setEnabled anti doble tap</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">✨</div><span class="feat-name">Hechizos Conocidos</span><span class="feat-kind">DIÁLOGO</span></div>
+          <div class="feat-body">
+            <p>Lista de hechizos generada por <code>agregarSpell()</code>. Badges de nivel con colores diferenciados (TRUCO verde, NIVEL 1 azul, NIVEL 2 violeta, NIVEL 3 rojo). Al tocar se abre un AlertDialog personalizado (spellcard) con tiempo de conjuración, alcance, objetivo, duración, concentración, ritual y descripción scrolleable de 220dp.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO</div>
+              <div class="flow-row"><span class="f-step trg">Tap en hechizo</span><span class="f-arr">→</span><span class="f-step dlg">AlertDialog spellcard</span><span class="f-arr">→</span><span class="f-step">Scroll descripción</span><span class="f-arr">→</span><span class="f-step ok">Cerrar tarjeta</span></div>
+            </div>
+            <div class="tags"><span class="tag t-dlg">AlertDialog custom</span><span class="tag t-ui">Badges color por nivel</span><span class="tag t-ui">ScrollView 220dp</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">🎲</div><span class="feat-name">Tirada de Dados</span><span class="feat-kind">ANIMACIÓN</span></div>
+          <div class="feat-body">
+            <p>6 botones (d4→d20) + aleatorio. Al tirar: rotación 360° (700ms) + flashes de números aleatorios cada 80ms. Al revelar el resultado: escala con OvershootInterpolator(2.5). D20 natural pulsa en dorado (alpha 1→0.3→1 × 3 reps). Pifia muestra calavera 💀 en rojo. Botón HISTORIAL abre AlertDialog con últimas 15 tiradas en lista alternada.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO TIRADA</div>
+              <div class="flow-row"><span class="f-step trg">Tap dado</span><span class="f-arr">→</span><span class="f-step">Rotación + flashes (700ms)</span><span class="f-arr">→</span><span class="f-step ok">Resultado + Overshoot (400ms)</span></div>
+              <div class="flow-row" style="margin-top:6px"><span class="f-step trg">Tap HISTORIAL</span><span class="f-arr">→</span><span class="f-step dlg">Diálogo últimas 15 tiradas</span></div>
+            </div>
+            <div class="tags"><span class="tag t-anim">ObjectAnimator rotación</span><span class="tag t-anim">OvershootInterpolator 2.5</span><span class="tag t-dlg">Historial dialog</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ PANTALLA 2 ════════════════ -->
+<div id="p2" class="wrap screen-block">
+  <div class="sec-header reveal">
+    <span class="sec-num">02 — GESTIÓN DE RECURSOS</span>
+    <h2 class="sec-title">Inventario</h2>
+    <p class="sec-desc">Gestión de carga, monedas y objetos del personaje. Accesible desde la barra de navegación inferior.</p>
+    <div class="ornament"><div class="orn-line orn-l"></div><span class="orn-d">✦</span><div class="orn-line orn-r"></div></div>
+  </div>
+
+  <div class="main-layout rev reveal">
+    <!-- INFO -->
+    <div class="info-col">
+      <div class="screen-label">
+        <span class="screen-tag">PANTALLA 02</span>
+        <span class="screen-name">InventarioActivity</span>
+      </div>
+      <p class="screen-intro">Pantalla de gestión de recursos materiales. Organizada en tres secciones: carga actual del personaje, monedas en circulación y lista de objetos equipados/en mochila.</p>
+
+      <div class="features">
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">🎒</div><span class="feat-name">Capacidad de Carga</span><span class="feat-kind">VISUAL</span></div>
+          <div class="feat-body">
+            <p>Muestra el peso actual vs. el máximo soportado. Una barra de progreso horizontal (<code>LinearLayout</code> con dos <code>View</code> de peso proporcional) indica visualmente el porcentaje consumido, coloreada en dorado. Basado en el sistema D&amp;D: Fuerza × 15 libras de capacidad máxima.</p>
+            <div class="tags"><span class="tag t-ui">Barra proporción LinearLayout</span><span class="tag t-ui">Peso en libras</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">💰</div><span class="feat-name">Monedas</span><span class="feat-kind">ESTÁTICA</span></div>
+          <div class="feat-body">
+            <p>Cuatro tipos de moneda D&amp;D 5e en columnas iguales (<code>layout_weight="1"</code>): Piezas de Platino (PP), Oro (PO), Electrum (PE) y Cobre (PC). Las PO se destacan en dorado como moneda principal de la economía del juego.</p>
+            <div class="tags"><span class="tag t-ui">4 columnas weight="1"</span><span class="tag t-ui">Color diferenciado por tipo</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">⚔</div><span class="feat-name">Lista de Objetos</span><span class="feat-kind">INTERACTIVA</span></div>
+          <div class="feat-body">
+            <p>Lista de objetos (<code>layoutObjetos</code>) con ícono emoji representativo, nombre, tipo, peso y propiedades. Los objetos equipados muestran badge "Eq." en dorado. Los consumibles muestran cantidad "×N". El botón ＋ en el encabezado agrega nuevos objetos dinámicamente.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO AGREGAR OBJETO</div>
+              <div class="flow-row"><span class="f-step trg">Tap en ＋</span><span class="f-arr">→</span><span class="f-step dlg">Formulario nuevo objeto</span><span class="f-arr">→</span><span class="f-step ok">Agregado a layoutObjetos</span></div>
+            </div>
+            <div class="tags"><span class="tag t-data">layoutObjetos dinámico</span><span class="tag t-ui">Badge equipado / cantidad</span><span class="tag t-ui">Íconos emoji por tipo</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">🗺️</div><span class="feat-name">Navegación desde Inventario</span><span class="feat-kind">MENU</span></div>
+          <div class="feat-body">
+            <p>La barra inferior navega hacia Inicio (startActivity + finish()), Notas y muestra un AlertDialog estético para Ajustes. El ítem Inventario reproduce animación btn_press sin navegar (ya está en esta pantalla). Todas las transiciones usan <code>overridePendingTransition(fade_in, fade_out)</code>.</p>
+            <div class="tags"><span class="tag t-ui">pulsarYEjecutar()</span><span class="tag t-anim">fade_in / fade_out</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHONE -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="app">
+          <div class="app-header">
+            <div class="h-title">D&amp;D Companion</div>
+            <div class="h-sub">INVENTARIO</div>
+          </div>
+          <!-- Carga -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">
+                <span>🎒 CARGA</span>
+                <span style="color:var(--gold-light);font-size:7px">12 / 120 lb</span>
+              </div>
+              <div class="a-sep"></div>
+              <div class="prog"><div class="prog-fill" style="width:10%"></div></div>
+            </div>
+          </div>
+          <!-- Monedas -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">💰 MONEDAS</div>
+              <div class="a-sep"></div>
+              <div class="coins">
+                <div class="coin"><span class="cl">PP</span><span class="cv">0</span></div>
+                <div class="coin"><span class="cl">PO</span><span class="cv go">45</span></div>
+                <div class="coin"><span class="cl">PE</span><span class="cv">0</span></div>
+                <div class="coin"><span class="cl">PC</span><span class="cv">12</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Objetos -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">
+                <span>⚔ OBJETOS</span>
+                <span class="a-btn">＋</span>
+              </div>
+              <div class="a-sep"></div>
+              <div class="inv-row">
+                <span style="font-size:13px">🗡️</span>
+                <div style="flex:1"><div style="color:var(--text);font-size:7.5px;font-weight:700">Espada Corta +1</div><div style="color:var(--text-sub);font-size:6px">Arma · 1 lb · Daño: 1d6+1 perforante</div></div>
+                <div class="a-badge">Eq.</div>
+              </div>
+              <div class="inv-row">
+                <span style="font-size:13px">🧪</span>
+                <div style="flex:1"><div style="color:var(--text);font-size:7.5px;font-weight:700">Poción de Curación</div><div style="color:var(--text-sub);font-size:6px">Consumible · 0.5 lb · Cura 2d4+2 PG</div></div>
+                <span style="color:var(--gold-light);font-size:9px;font-weight:700">×3</span>
+              </div>
+              <div class="inv-row">
+                <span style="font-size:13px">📜</span>
+                <div style="flex:1"><div style="color:var(--text);font-size:7.5px;font-weight:700">Pergamino de Bola de Fuego</div><div style="color:var(--text-sub);font-size:6px">Pergamino mágico · Nivel 3</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="height:24px"></div>
+          <div class="app-nav">
+            <div class="nav-item off">✦<br>INICIO</div>
+            <div class="nav-item on">🎒<br>INVENTARIO</div>
+            <div class="nav-item off">📖<br>NOTAS</div>
+            <div class="nav-item off">⚙<br>AJUSTES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ PANTALLA 3 ════════════════ -->
+<div id="p3" class="wrap screen-block">
+  <div class="sec-header reveal">
+    <span class="sec-num">03 — REGISTRO DE CAMPAÑA</span>
+    <h2 class="sec-title">Notas</h2>
+    <p class="sec-desc">Bitácora de campaña: diario de sesiones, registro de NPCs y bloc de notas en tiempo real.</p>
+    <div class="ornament"><div class="orn-line orn-l"></div><span class="orn-d">✦</span><div class="orn-line orn-r"></div></div>
+  </div>
+
+  <div class="main-layout reveal">
+    <!-- PHONE -->
+    <div class="phone-col">
+      <div class="phone">
+        <div class="app">
+          <div class="app-header">
+            <div class="h-title">D&amp;D Companion</div>
+            <div class="h-sub">NOTAS DE CAMPAÑA</div>
+          </div>
+          <!-- Diario -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title"><span>📜 DIARIO DE AVENTURAS</span><span class="a-btn">＋</span></div>
+              <div class="a-sep"></div>
+              <div class="nota-card">
+                <div class="nota-head"><span class="nota-title">Sesión 1 — La Taberna del Oso</span><span class="nota-date">12/04</span></div>
+                <div class="nota-text">Nos encontramos con el mercader Harwick. Mencionó que los caminos al norte están infestados de bandidos. Hay algo más detrás...</div>
+              </div>
+              <div class="nota-card">
+                <div class="nota-head"><span class="nota-title">Sesión 2 — Las Colinas del Eco</span><span class="nota-date">19/04</span></div>
+                <div class="nota-text">Encontramos la cripta. Símbolo de serpiente en la puerta. Zorathis lo reconoció.</div>
+              </div>
+            </div>
+          </div>
+          <!-- NPCs -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">👥 NPCs CONOCIDOS</div>
+              <div class="a-sep"></div>
+              <div class="npc-row">
+                <div class="dot dot-g"></div>
+                <div><div style="color:var(--text);font-size:7.5px;font-weight:700">Harwick el Mercader</div><div style="color:var(--text-sub);font-size:6px">Aliado · Taberna del Oso, Valemar</div></div>
+              </div>
+              <div class="npc-row">
+                <div class="dot dot-r"></div>
+                <div><div style="color:var(--text);font-size:7.5px;font-weight:700">El Señor de las Sombras</div><div style="color:var(--text-sub);font-size:6px">Antagonista · Paradero desconocido</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Nota rápida -->
+          <div class="a-sec">
+            <div class="a-sec-inner">
+              <div class="a-sec-title">✏ NOTA RÁPIDA</div>
+              <div class="a-sep"></div>
+              <div class="edit-area">Escribe aquí tus notas...</div>
+              <div class="wide-btn" style="margin-top:4px">💾 GUARDAR NOTA</div>
+            </div>
+          </div>
+          <div class="app-nav">
+            <div class="nav-item off">✦<br>INICIO</div>
+            <div class="nav-item off">🎒<br>INVENTARIO</div>
+            <div class="nav-item on">📖<br>NOTAS</div>
+            <div class="nav-item off">⚙<br>AJUSTES</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-col">
+      <div class="screen-label">
+        <span class="screen-tag">PANTALLA 03</span>
+        <span class="screen-name">NotasActivity</span>
+      </div>
+      <p class="screen-intro">Bitácora personal del jugador. Tres secciones para registrar el progreso narrativo: diario cronológico de sesiones, ficha de NPCs con indicador de relación y área de escritura libre en tiempo real.</p>
+
+      <div class="features">
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">📜</div><span class="feat-name">Diario de Aventuras</span><span class="feat-kind">REGISTRO</span></div>
+          <div class="feat-body">
+            <p>Tarjetas de entrada ordenadas cronológicamente por sesión. Cada tarjeta (<code>background: stat_bg</code>) muestra título de sesión en dorado claro, fecha alineada a la derecha y texto narrativo completo. El botón ＋ del encabezado crea nuevas entradas.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO</div>
+              <div class="flow-row"><span class="f-step trg">Tap en ＋</span><span class="f-arr">→</span><span class="f-step dlg">Formulario nueva entrada</span><span class="f-arr">→</span><span class="f-step ok">Nueva tarjeta en el diario</span></div>
+            </div>
+            <div class="tags"><span class="tag t-ui">Tarjetas stat_bg</span><span class="tag t-data">Orden cronológico</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">👥</div><span class="feat-name">NPCs Conocidos</span><span class="feat-kind">REFERENCIA</span></div>
+          <div class="feat-body">
+            <p>Lista de personajes no jugadores relevantes. Indicador de relación mediante círculo de color: 🟢 verde para aliados, 🔴 rojo para antagonistas, 🟡 amarillo para neutrales. Nombre en negrita, rol y última ubicación conocida.</p>
+            <ul style="list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:5px">
+              <li style="display:flex;gap:8px;font-size:13.5px;color:var(--text-sub)"><span style="color:var(--gold-dim)">1.</span>El jugador identifica aliados y enemigos de un vistazo por el color del indicador.</li>
+              <li style="display:flex;gap:8px;font-size:13.5px;color:var(--text-sub)"><span style="color:var(--gold-dim)">2.</span>La ubicación ayuda a recordar dónde encontrar cada NPC en la campaña.</li>
+            </ul>
+            <div class="tags"><span class="tag t-ui">Indicador relación por color</span><span class="tag t-ui">Nombre + ubicación</span></div>
+          </div>
+        </div>
+
+        <div class="feat">
+          <div class="feat-head"><div class="feat-ico">✏️</div><span class="feat-name">Nota Rápida</span><span class="feat-kind">EDITABLE</span></div>
+          <div class="feat-body">
+            <p>Campo <code>EditText</code> multilinea para apuntes instantáneos durante la sesión. Fondo <code>stat_bg</code>, mínimo 4 líneas visibles, crece con el contenido. Al presionar GUARDAR NOTA muestra un Toast "✦ Nota guardada" — implementado en <code>NotasActivity.java</code> con <code>Toast.makeText()</code>.</p>
+            <div style="margin-top:10px">
+              <div class="flow-title">FLUJO</div>
+              <div class="flow-row"><span class="f-step trg">Tap en EditText</span><span class="f-arr">→</span><span class="f-step">Teclado, escritura libre</span><span class="f-arr">→</span><span class="f-step trg">Tap GUARDAR</span><span class="f-arr">→</span><span class="f-step ok">Toast "✦ Nota guardada"</span></div>
+            </div>
+            <div class="tags"><span class="tag t-data">EditText inputType multiLine</span><span class="tag t-ui">Toast confirmación</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ FLUJO GLOBAL ════════════════ -->
+<div id="flujo" class="wrap">
+  <div class="sec-header reveal">
+    <span class="sec-num">04 — FLUJO GLOBAL</span>
+    <h2 class="sec-title">Navegación entre Pantallas</h2>
+    <p class="sec-desc">Barra inferior fija compartida por las tres Activities. Transición con <code>overridePendingTransition(fade_in, fade_out)</code>. Ajustes muestra AlertDialog estético en todas las pantallas.</p>
+    <div class="ornament"><div class="orn-line orn-l"></div><span class="orn-d">✦</span><div class="orn-line orn-r"></div></div>
+  </div>
+
+  <div class="gf-wrap reveal">
+    <div class="gf-title">FUNCIONALIDADES POR PANTALLA</div>
+    <div class="gf-grid">
+      <div class="gf-col">
+        <div class="gf-col-title"><span class="gf-num">01</span> Inicio</div>
+        <div class="gf-item"><div class="gf-dot"></div>Ver ficha del personaje con avatar</div>
+        <div class="gf-item"><div class="gf-dot"></div>Seleccionar foto de galería para el avatar</div>
+        <div class="gf-item"><div class="gf-dot"></div>Aceptar misiones disponibles con animación</div>
+        <div class="gf-item"><div class="gf-dot"></div>Ver misiones activas generadas en tiempo real</div>
+        <div class="gf-item"><div class="gf-dot"></div>Agregar nuevas misiones disponibles</div>
+        <div class="gf-item"><div class="gf-dot"></div>Tap en hechizo → spellcard en diálogo</div>
+        <div class="gf-item"><div class="gf-dot"></div>Tirar dados (d4–d20) con animación ruleta</div>
+        <div class="gf-item"><div class="gf-dot"></div>Ver historial de las últimas 15 tiradas</div>
+        <div class="gf-item"><div class="gf-dot"></div>Dado especial d20 natural / pifia</div>
+      </div>
+      <div class="gf-col">
+        <div class="gf-col-title"><span class="gf-num">02</span> Inventario</div>
+        <div class="gf-item"><div class="gf-dot"></div>Ver capacidad de carga con barra visual</div>
+        <div class="gf-item"><div class="gf-dot"></div>Consultar balance de las 4 monedas D&D</div>
+        <div class="gf-item"><div class="gf-dot"></div>Listar objetos con tipo, peso y propiedades</div>
+        <div class="gf-item"><div class="gf-dot"></div>Identificar objetos equipados (badge "Eq.")</div>
+        <div class="gf-item"><div class="gf-dot"></div>Ver cantidad de consumibles (×N)</div>
+        <div class="gf-item"><div class="gf-dot"></div>Agregar nuevos objetos con botón ＋</div>
+      </div>
+      <div class="gf-col">
+        <div class="gf-col-title"><span class="gf-num">03</span> Notas</div>
+        <div class="gf-item"><div class="gf-dot"></div>Leer entradas del diario por sesión</div>
+        <div class="gf-item"><div class="gf-dot"></div>Crear nueva entrada de diario</div>
+        <div class="gf-item"><div class="gf-dot"></div>Consultar NPCs con indicador de relación</div>
+        <div class="gf-item"><div class="gf-dot"></div>Identificar aliados y antagonistas por color</div>
+        <div class="gf-item"><div class="gf-dot"></div>Escribir nota rápida en tiempo real</div>
+        <div class="gf-item"><div class="gf-dot"></div>Guardar nota con confirmación Toast</div>
+      </div>
+    </div>
+
+    <div class="gf-nav">
+      <div class="gf-ni">✦<br>INICIO</div>
+      <span class="gf-arr">⟷</span>
+      <div class="gf-ni">🎒<br>INVENTARIO</div>
+      <span class="gf-arr">⟷</span>
+      <div class="gf-ni">📖<br>NOTAS</div>
+      <span class="gf-arr">⟷</span>
+      <div class="gf-ni">⚙<br>AJUSTES</div>
+      <p class="gf-note">Transición fade_in / fade_out · Ítem activo resaltado en dorado · Ajustes: AlertDialog en todas las pantallas</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<div class="footer wrap">
+  <p>✦  ✦  ✦</p>
+  <p>D&amp;D Companion · Informe de Pantallas · Parcial 1</p>
+  <p>Android nativo Java · ConstraintLayout + LinearLayout · Conventional Commits</p>
+  <p style="margin-top:10px">
+    <a href="https://github.com/Krayxzlim/parcial-1-am-acn4a-aufieri_luciano"
+       style="color:var(--gold-light);font-family:'JetBrains Mono',monospace;font-size:12px">
+      github.com/Krayxzlim/parcial-1-am-acn4a-aufieri_luciano
+    </a>
+  </p>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.06 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+document.querySelectorAll('.nav-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
