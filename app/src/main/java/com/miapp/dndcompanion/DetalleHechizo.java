@@ -17,47 +17,57 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 /**
- * Detalle de hechizo.
- * Datos desde Intent extras desde MainActivity.
- * Descarga la imagen del hechizo desde URL usando Glide.
+ * Pantalla de detalle de hechizo.
+ * Recibe datos vía Intent extras desde MainActivity.
+ * Campos alineados con la Open5e API v1.
  */
 public class DetalleHechizo extends AppCompatActivity {
 
-    //Claves para los extras
-    public static final String EXTRA_NOMBRE        = "hechizo_nombre";
-    public static final String EXTRA_NIVEL         = "hechizo_nivel";
-    public static final String EXTRA_ESCUELA       = "hechizo_escuela";
-    public static final String EXTRA_TIEMPO        = "hechizo_tiempo";
-    public static final String EXTRA_ALCANCE       = "hechizo_alcance";
-    public static final String EXTRA_OBJETIVO      = "hechizo_objetivo";
-    public static final String EXTRA_DURACION      = "hechizo_duracion";
-    public static final String EXTRA_CONCENTRACION = "hechizo_concentracion";
-    public static final String EXTRA_RITUAL        = "hechizo_ritual";
-    public static final String EXTRA_DESCRIPCION   = "hechizo_descripcion";
-    public static final String EXTRA_IMAGEN_URL    = "hechizo_imagen_url";
+    //Claves de extras (alineadas con campos de la API)
+    public static final String EXTRA_SLUG           = "spell_slug";
+    public static final String EXTRA_NAME           = "spell_name";
+    public static final String EXTRA_DESC           = "spell_desc";
+    public static final String EXTRA_HIGHER_LEVEL   = "spell_higher_level";
+    public static final String EXTRA_RANGE          = "spell_range";
+    public static final String EXTRA_COMPONENTS     = "spell_components";
+    public static final String EXTRA_MATERIAL       = "spell_material";
+    public static final String EXTRA_CASTING_TIME   = "spell_casting_time";
+    public static final String EXTRA_LEVEL          = "spell_level";
+    public static final String EXTRA_LEVEL_INT      = "spell_level_int";
+    public static final String EXTRA_SCHOOL         = "spell_school";
+    public static final String EXTRA_DURATION       = "spell_duration";
+    public static final String EXTRA_CONCENTRATION  = "spell_concentration";
+    public static final String EXTRA_RITUAL         = "spell_ritual";
+    public static final String EXTRA_DND_CLASS      = "spell_dnd_class";
+    public static final String EXTRA_IMAGEN_URL     = "spell_imagen_url";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Leer extras de Intent
         Intent intent = getIntent();
-        String nombre        = intent.getStringExtra(EXTRA_NOMBRE);
-        String nivel         = intent.getStringExtra(EXTRA_NIVEL);
-        String escuela       = intent.getStringExtra(EXTRA_ESCUELA);
-        String tiempo        = intent.getStringExtra(EXTRA_TIEMPO);
-        String alcance       = intent.getStringExtra(EXTRA_ALCANCE);
-        String objetivo      = intent.getStringExtra(EXTRA_OBJETIVO);
-        String duracion      = intent.getStringExtra(EXTRA_DURACION);
-        boolean concentracion= intent.getBooleanExtra(EXTRA_CONCENTRACION, false);
-        boolean ritual       = intent.getBooleanExtra(EXTRA_RITUAL, false);
-        String descripcion   = intent.getStringExtra(EXTRA_DESCRIPCION);
-        String imagenUrl     = intent.getStringExtra(EXTRA_IMAGEN_URL);
+        String name             = intent.getStringExtra(EXTRA_NAME);
+        String desc             = intent.getStringExtra(EXTRA_DESC);
+        String higherLevel      = intent.getStringExtra(EXTRA_HIGHER_LEVEL);
+        String range            = intent.getStringExtra(EXTRA_RANGE);
+        String components       = intent.getStringExtra(EXTRA_COMPONENTS);
+        String material         = intent.getStringExtra(EXTRA_MATERIAL);
+        String castingTime      = intent.getStringExtra(EXTRA_CASTING_TIME);
+        String level            = intent.getStringExtra(EXTRA_LEVEL);
+        int    levelInt         = intent.getIntExtra(EXTRA_LEVEL_INT, 0);
+        String school           = intent.getStringExtra(EXTRA_SCHOOL);
+        String duration         = intent.getStringExtra(EXTRA_DURATION);
+        boolean concentration   = intent.getBooleanExtra(EXTRA_CONCENTRATION, false);
+        boolean ritual          = intent.getBooleanExtra(EXTRA_RITUAL, false);
+        String dndClass         = intent.getStringExtra(EXTRA_DND_CLASS);
+        String imagenUrl        = intent.getStringExtra(EXTRA_IMAGEN_URL);
 
-        //Layout raíz
+        // Badge label a partir de levelInt
+        String badgeLabel = (levelInt == 0) ? "TRUCO" : "NIVEL " + levelInt;
+
+        // Layout raíz
         ScrollView scrollView = new ScrollView(this);
         scrollView.setBackgroundColor(color(R.color.fondo));
-        scrollView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -66,12 +76,12 @@ public class DetalleHechizo extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         scrollView.addView(root);
 
-        //Header dorado
+        // Header
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.VERTICAL);
         header.setGravity(Gravity.CENTER);
         header.setBackgroundColor(color(R.color.seccion_fondo));
-        header.setPadding(dp(16), dp(36), dp(16), dp(12));
+        header.setPadding(dp(16), dp(36), dp(16), dp(14));
 
         // Botón volver
         TextView btnVolver = new TextView(this);
@@ -82,9 +92,8 @@ public class DetalleHechizo extends AppCompatActivity {
         btnVolver.setClickable(true);
         btnVolver.setFocusable(true);
         LinearLayout.LayoutParams volverLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        volverLp.setMargins(0, 0, 0, dp(8));
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        volverLp.setMargins(0, 0, 0, dp(10));
         btnVolver.setLayoutParams(volverLp);
         btnVolver.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
@@ -93,70 +102,79 @@ public class DetalleHechizo extends AppCompatActivity {
         });
         header.addView(btnVolver);
 
-        // Badge nivel + escuela
+        // Fila badge + escuela
         LinearLayout filaBadge = new LinearLayout(this);
         filaBadge.setOrientation(LinearLayout.HORIZONTAL);
         filaBadge.setGravity(Gravity.CENTER_VERTICAL);
+        filaBadge.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        int[] badgeColors = getBadgeColors(nivel);
+        int[] badgeColors = getBadgeColors(levelInt);
         TextView badgeView = new TextView(this);
-        badgeView.setText(nivel != null ? nivel : "");
+        badgeView.setText(badgeLabel);
         badgeView.setTextColor(badgeColors[1]);
         badgeView.setBackgroundColor(badgeColors[0]);
         badgeView.setTextSize(9);
         badgeView.setPadding(dp(10), dp(4), dp(10), dp(4));
         LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         bLp.setMargins(0, 0, dp(8), 0);
         badgeView.setLayoutParams(bLp);
+        filaBadge.addView(badgeView);
 
-        TextView escuelaView = new TextView(this);
-        escuelaView.setText(escuela != null ? escuela.toUpperCase() : "");
-        escuelaView.setTextColor(color(R.color.texto_secundario));
-        escuelaView.setTextSize(10);
-        escuelaView.setLayoutParams(new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        // Escuela
+        if (school != null && !school.isEmpty()) {
+            TextView escuelaView = new TextView(this);
+            escuelaView.setText(capitalize(school));
+            escuelaView.setTextColor(color(R.color.texto_secundario));
+            escuelaView.setTextSize(10);
+            escuelaView.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            filaBadge.addView(escuelaView);
+        }
 
-        if (concentracion) {
-            TextView c = new TextView(this);
-            c.setText("◎ CONC.");
-            c.setTextColor(color(R.color.dorado_claro));
-            c.setTextSize(8);
-            c.setBackgroundColor(color(R.color.boton_bg));
-            c.setPadding(dp(6), dp(3), dp(6), dp(3));
+        // Badges Concentración y Ritual
+        if (concentration) {
+            TextView c = badge("◎ CONC.");
             filaBadge.addView(c);
         }
         if (ritual) {
-            TextView r = new TextView(this);
-            r.setText(" ® ");
-            r.setTextColor(color(R.color.dorado));
-            r.setTextSize(9);
+            TextView r = badge(" ® RITUAL");
             filaBadge.addView(r);
         }
-
-        filaBadge.addView(badgeView);
-        filaBadge.addView(escuelaView);
         header.addView(filaBadge);
 
-        // Nombre del hechizo
+        // Nombre
         TextView nomView = new TextView(this);
-        nomView.setText(nombre != null ? nombre : "");
+        nomView.setText(name != null ? name : "");
         nomView.setTextSize(26);
         nomView.setTextColor(color(R.color.dorado));
         nomView.setTypeface(Typeface.create("serif", Typeface.BOLD));
         nomView.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams nomLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         nomLp.setMargins(0, dp(8), 0, 0);
         nomView.setLayoutParams(nomLp);
         header.addView(nomView);
 
+        // Clases que pueden usar el hechizo
+        if (dndClass != null && !dndClass.isEmpty()) {
+            TextView claseView = new TextView(this);
+            claseView.setText(dndClass);
+            claseView.setTextColor(color(R.color.texto_secundario));
+            claseView.setTextSize(10);
+            claseView.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams claseLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            claseLp.setMargins(0, dp(4), 0, 0);
+            claseView.setLayoutParams(claseLp);
+            header.addView(claseView);
+        }
+
         root.addView(header);
         root.addView(separadorDorado());
 
-        //Imagen del hechizo desde URL (Glide)
+        //Imagen desde URL (Glide) o placeholder
         ImageView imgHechizo = new ImageView(this);
         imgHechizo.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imgHechizo.setBackgroundColor(color(R.color.stat_fondo));
@@ -172,79 +190,139 @@ public class DetalleHechizo extends AppCompatActivity {
                     .error(R.drawable.ic_launcher_foreground)
                     .into(imgHechizo);
         } else {
-            // Imagen de placeholder si no hay URL
             imgHechizo.setImageResource(R.drawable.ic_launcher_foreground);
         }
         root.addView(imgHechizo);
         root.addView(separadorDorado());
 
-        //Props de hechizo
+        //Tabla de propiedades (campos de la API)
         LinearLayout props = new LinearLayout(this);
         props.setOrientation(LinearLayout.HORIZONTAL);
         props.setBackgroundColor(color(R.color.stat_fondo));
-        props.setPadding(dp(12), dp(14), dp(12), dp(14));
+        props.setPadding(dp(8), dp(14), dp(8), dp(14));
 
-        props.addView(propCol("TIEMPO DE LANZAMIENTO", tiempo != null ? tiempo : "-"));
+        props.addView(propCol("TIEMPO", castingTime));
         props.addView(propSep());
-        props.addView(propCol("ALCANCE", alcance != null ? alcance : "-"));
+        props.addView(propCol("ALCANCE", range));
         props.addView(propSep());
-        props.addView(propCol("OBJETIVO", objetivo != null ? objetivo : "-"));
+        props.addView(propCol("DURACIÓN", duration));
         props.addView(propSep());
-        props.addView(propCol("DURACIÓN", duracion != null ? duracion : "-"));
+        props.addView(propCol("COMP.", components));
         root.addView(props);
         root.addView(separadorBorde());
 
-        //descripción
+        // Material (si existe)
+        if (material != null && !material.isEmpty()) {
+            LinearLayout matBox = new LinearLayout(this);
+            matBox.setOrientation(LinearLayout.VERTICAL);
+            matBox.setBackgroundColor(color(R.color.fondo));
+            matBox.setPadding(dp(16), dp(10), dp(16), dp(10));
+
+            TextView matLabel = labelTexto("✦  MATERIAL");
+            matBox.addView(matLabel);
+
+            TextView matVal = new TextView(this);
+            matVal.setText(capitalize(material));
+            matVal.setTextColor(color(R.color.texto_secundario));
+            matVal.setTextSize(13);
+            matVal.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            matBox.addView(matVal);
+            root.addView(matBox);
+            root.addView(separadorBorde());
+        }
+
+        // Descripción
         LinearLayout secDesc = new LinearLayout(this);
         secDesc.setOrientation(LinearLayout.VERTICAL);
-        secDesc.setPadding(dp(20), dp(20), dp(20), dp(20));
+        secDesc.setPadding(dp(16), dp(16), dp(16), dp(16));
         secDesc.setBackgroundColor(color(R.color.fondo));
 
-        TextView lblDesc = new TextView(this);
-        lblDesc.setText("✦  DESCRIPCIÓN");
-        lblDesc.setTextColor(color(R.color.dorado));
-        lblDesc.setTextSize(11);
-        lblDesc.setTypeface(Typeface.create("serif", Typeface.BOLD));
-        lblDesc.setLetterSpacing(0.08f);
-        LinearLayout.LayoutParams lblLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lblLp.setMargins(0, 0, 0, dp(10));
-        lblDesc.setLayoutParams(lblLp);
-        secDesc.addView(lblDesc);
-
-        View sepDesc = new View(this);
-        sepDesc.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 1));
-        sepDesc.setBackgroundColor(color(R.color.dorado_borde));
-        LinearLayout.LayoutParams sepLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 1);
-        sepLp.setMargins(0, 0, 0, dp(14));
-        sepDesc.setLayoutParams(sepLp);
-        secDesc.addView(sepDesc);
+        secDesc.addView(labelTexto("✦  DESCRIPCIÓN"));
+        secDesc.addView(separadorBorde());
 
         TextView descView = new TextView(this);
-        descView.setText(descripcion != null ? descripcion : "");
+        descView.setText(desc != null ? desc : "");
         descView.setTextColor(color(R.color.texto));
-        descView.setTextSize(15);
-        descView.setLineSpacing(dp(4), 1.0f);
-        descView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+        descView.setTextSize(14);
+        descView.setLineSpacing(dp(3), 1.0f);
+        LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        descLp.setMargins(0, dp(10), 0, 0);
+        descView.setLayoutParams(descLp);
         secDesc.addView(descView);
+
+        // En niveles superiores
+        if (higherLevel != null && !higherLevel.isEmpty()) {
+            View sep = new View(this);
+            LinearLayout.LayoutParams sepLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
+            sepLp.setMargins(0, dp(14), 0, dp(14));
+            sep.setLayoutParams(sepLp);
+            sep.setBackgroundColor(color(R.color.borde));
+            secDesc.addView(sep);
+
+            secDesc.addView(labelTexto("✦  EN NIVELES SUPERIORES"));
+
+            TextView hlView = new TextView(this);
+            hlView.setText(higherLevel);
+            hlView.setTextColor(color(R.color.texto_secundario));
+            hlView.setTextSize(13);
+            hlView.setLineSpacing(dp(3), 1.0f);
+            LinearLayout.LayoutParams hlLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            hlLp.setMargins(0, dp(8), 0, 0);
+            hlView.setLayoutParams(hlLp);
+            secDesc.addView(hlView);
+        }
+
         root.addView(secDesc);
+
+        // Espacio al final para scroll cómodo
+        View spacer = new View(this);
+        spacer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(40)));
+        root.addView(spacer);
 
         setContentView(scrollView);
     }
 
-    private int[] getBadgeColors(String nivel) {
-        if (nivel == null) return new int[]{color(R.color.badge_truco), color(R.color.badge_truco_texto)};
-        switch (nivel) {
-            case "TRUCO":   return new int[]{color(R.color.badge_truco),  color(R.color.badge_truco_texto)};
-            case "NIVEL 1": return new int[]{color(R.color.badge_nivel1), color(R.color.badge_nivel1_texto)};
-            case "NIVEL 2": return new int[]{color(R.color.badge_nivel2), color(R.color.badge_nivel2_texto)};
-            default:        return new int[]{color(R.color.badge_nivel3), color(R.color.badge_nivel3_texto)};
+    /** Badge para nivel de hechizo */
+    private int[] getBadgeColors(int levelInt) {
+        switch (levelInt) {
+            case 0:  return new int[]{color(R.color.badge_truco),  color(R.color.badge_truco_texto)};
+            case 1:  return new int[]{color(R.color.badge_nivel1), color(R.color.badge_nivel1_texto)};
+            case 2:  return new int[]{color(R.color.badge_nivel2), color(R.color.badge_nivel2_texto)};
+            default: return new int[]{color(R.color.badge_nivel3), color(R.color.badge_nivel3_texto)};
         }
+    }
+
+    private TextView badge(String texto) {
+        TextView tv = new TextView(this);
+        tv.setText(texto);
+        tv.setTextColor(color(R.color.dorado_claro));
+        tv.setTextSize(8);
+        tv.setBackgroundColor(color(R.color.boton_bg));
+        tv.setPadding(dp(6), dp(3), dp(6), dp(3));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(dp(4), 0, 0, 0);
+        tv.setLayoutParams(lp);
+        return tv;
+    }
+
+    private TextView labelTexto(String texto) {
+        TextView tv = new TextView(this);
+        tv.setText(texto);
+        tv.setTextColor(color(R.color.dorado));
+        tv.setTextSize(10);
+        tv.setTypeface(Typeface.create("serif", Typeface.BOLD));
+        tv.setLetterSpacing(0.08f);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, dp(6));
+        tv.setLayoutParams(lp);
+        return tv;
     }
 
     private LinearLayout propCol(String etiqueta, String valor) {
@@ -260,17 +338,15 @@ public class DetalleHechizo extends AppCompatActivity {
         et.setTextSize(7);
         et.setGravity(Gravity.CENTER);
         et.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
         TextView val = new TextView(this);
-        val.setText(valor);
+        val.setText(valor != null ? valor : "-");
         val.setTextColor(color(R.color.texto));
         val.setTextSize(10);
         val.setGravity(Gravity.CENTER);
         val.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
         col.addView(et);
         col.addView(val);
@@ -301,6 +377,11 @@ public class DetalleHechizo extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT, 1));
         v.setBackgroundColor(color(R.color.borde));
         return v;
+    }
+
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty()) return "";
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     private int dp(int val) {
