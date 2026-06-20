@@ -224,5 +224,5 @@ Al completar una misión, el XP de la recompensa se suma al personaje activo (`P
 ---
 
 <p align="center">
-  <sub>✦ &nbsp; D&D Companion · ACN4A · 2025 &nbsp; ✦</sub>
+  <sub>✦ &nbsp; D&D Companion · 4ZV7 · 2026 &nbsp; ✦</sub>
 </p>
