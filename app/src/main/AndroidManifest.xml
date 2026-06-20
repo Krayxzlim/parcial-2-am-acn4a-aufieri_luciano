@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permiso para descargar imágenes con Glide y conectar a Firebase -->
+    <!-- Descarga de imágenes (Glide) y llamadas a la Open5e API -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -15,10 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DndCompanion">
 
-        <!--
-            LoginActivity es el Launcher.
-            Maneja Firebase Auth y redirige a MainActivity si ya hay sesión.
-        -->
+        <!-- LAUNCHER: Login con Firebase Auth -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -28,25 +25,47 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity recibe el email del usuario vía extras -->
+        <!-- Pantalla principal — recibe email vía extras -->
         <activity
             android:name=".MainActivity"
             android:exported="false"/>
 
+        <!-- Inventario -->
         <activity
             android:name=".InventarioActivity"
             android:exported="false"/>
 
+        <!-- Notas -->
         <activity
             android:name=".NotasActivity"
             android:exported="false"/>
 
         <!--
-            DetalleHechizo recibe todos los datos del hechizo vía Intent extras.
-            Descarga la imagen desde URL usando Glide.
+            Detalle de hechizo.
+            Recibe 16 extras desde MainActivity o SpellListActivity.
+            Descarga imagen con Glide si imagenUrl no es null.
         -->
         <activity
             android:name=".DetalleHechizo"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!--
+            Grimorio — lista de hechizos desde la Open5e API.
+            Filtros: nombre, nivel, escuela, clase.
+        -->
+        <activity
+            android:name=".SpellListActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+        <!--
+            Creador de personaje.
+            Razas desde la Open5e API.
+            Guarda en Firestore y devuelve resultado vía setResult().
+        -->
+        <activity
+            android:name=".CrearPersonajeActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"/>
 

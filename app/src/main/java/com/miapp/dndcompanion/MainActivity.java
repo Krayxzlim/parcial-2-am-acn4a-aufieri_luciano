@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,155 +14,171 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
-import java.util.Random;
-import android.net.Uri;
-import android.widget.ImageView;
+
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_USER_EMAIL = "user_email";
 
-    // Firebase
+    //Firebase
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userEmail = "";
 
-    // Vistas
+    //Vistas
     LinearLayout layoutDisponibles, layoutActivas, layoutSpells;
     TextView txtResultado, txtTipoDado;
     ImageView imgAvatar;
+
+    // Vistas del personaje (placeholder)
+    TextView txtNombrePersonaje, txtRazaPersonaje, txtClasePersonaje,
+            txtAlineacionPersonaje, txtPersonajePlaceholder;
+    TextView txtCA, txtPG, txtNivelStat;
+    TextView txtFUE, txtDES, txtCON, txtINT, txtSAB, txtCAR;
+    TextView txtFUEmod, txtDESmod, txtCONmod, txtINTmod, txtSABmod, txtCARmod;
+    LinearLayout layoutAvatarPlaceholder;
+
+    //Launchers
     ActivityResultLauncher<String> pickImageLauncher;
+    ActivityResultLauncher<Intent> crearPersonajeLauncher;
+
     int contador = 0;
     Random random = new Random();
     ArrayList<String> historial = new ArrayList<>();
 
-    // Animaciones
-    Animation animBtn, animDado, animMisionSale, animMisionEntra;
-
-    // Datos de hechizos (para el Intent a DetalleHechizo)
-    private static class SpellData {
-        String nombre, nivel, escuela, tiempo, alcance, objetivo, duracion, descripcion, imagenUrl;
-        boolean concentracion, ritual;
-        SpellData(String nombre, String nivel, String escuela, String tiempo, String alcance,
-                  String objetivo, String duracion, boolean concentracion, boolean ritual,
-                  String descripcion, String imagenUrl) {
-            this.nombre = nombre; this.nivel = nivel; this.escuela = escuela;
-            this.tiempo = tiempo; this.alcance = alcance; this.objetivo = objetivo;
-            this.duracion = duracion; this.concentracion = concentracion; this.ritual = ritual;
-            this.descripcion = descripcion; this.imagenUrl = imagenUrl;
-        }
-    }
+    Animation animBtn, animDado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Recibir extras del LoginActivity
         userEmail = getIntent().getStringExtra(EXTRA_USER_EMAIL);
         if (userEmail == null) userEmail = "";
 
-        // Firebase init
         mAuth = FirebaseAuth.getInstance();
         db    = FirebaseFirestore.getInstance();
 
+        // Launcher para seleccionar imagen del avatar
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
-                uri -> { if (uri != null) imgAvatar.setImageURI(uri); }
+                uri -> {
+                    if (uri != null) {
+                        imgAvatar.setImageURI(uri);
+                        imgAvatar.setVisibility(View.VISIBLE);
+                        layoutAvatarPlaceholder.setVisibility(View.GONE);
+                    }
+                }
+        );
+
+        // Launcher para recibir resultado del CrearPersonajeActivity
+        crearPersonajeLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        Intent data = result.getData();
+                        aplicarDatosPersonaje(
+                                data.getStringExtra("personaje_nombre"),
+                                data.getStringExtra("personaje_raza"),
+                                data.getStringExtra("personaje_clase"),
+                                data.getIntExtra("personaje_nivel", 1),
+                                data.getStringExtra("personaje_alineacion"),
+                                data.getIntExtra("personaje_fue", 10),
+                                data.getIntExtra("personaje_des", 10),
+                                data.getIntExtra("personaje_con", 10),
+                                data.getIntExtra("personaje_int", 10),
+                                data.getIntExtra("personaje_sab", 10),
+                                data.getIntExtra("personaje_car", 10)
+                        );
+                    }
+                }
         );
 
         setContentView(R.layout.activity_main);
 
-        // Precargar animaciones
-        animBtn         = AnimationUtils.loadAnimation(this, R.anim.btn_press);
-        animDado        = AnimationUtils.loadAnimation(this, R.anim.dado_roll);
-        animMisionSale  = AnimationUtils.loadAnimation(this, R.anim.mision_aceptar);
-        animMisionEntra = AnimationUtils.loadAnimation(this, R.anim.mision_entrar);
+        animBtn  = AnimationUtils.loadAnimation(this, R.anim.btn_press);
+        animDado = AnimationUtils.loadAnimation(this, R.anim.dado_roll);
 
+        //Bindear vistas
         layoutDisponibles = findViewById(R.id.layoutDisponibles);
         layoutActivas     = findViewById(R.id.layoutActivas);
         layoutSpells      = findViewById(R.id.layoutSpells);
         txtResultado      = findViewById(R.id.txtResultado);
         txtTipoDado       = findViewById(R.id.txtTipoDado);
+        imgAvatar         = findViewById(R.id.imgAvatar);
 
-        imgAvatar = findViewById(R.id.imgAvatar);
+        // Personaje
+        txtNombrePersonaje    = findViewById(R.id.txtNombrePersonaje);
+        txtRazaPersonaje      = findViewById(R.id.txtRazaPersonaje);
+        txtClasePersonaje     = findViewById(R.id.txtClasePersonaje);
+        txtAlineacionPersonaje= findViewById(R.id.txtAlineacionPersonaje);
+        txtPersonajePlaceholder= findViewById(R.id.txtPersonajePlaceholder);
+        txtCA                 = findViewById(R.id.txtCA);
+        txtPG                 = findViewById(R.id.txtPG);
+        txtNivelStat          = findViewById(R.id.txtNivelStat);
+        txtFUE = findViewById(R.id.txtFUE); txtFUEmod = findViewById(R.id.txtFUEmod);
+        txtDES = findViewById(R.id.txtDES); txtDESmod = findViewById(R.id.txtDESmod);
+        txtCON = findViewById(R.id.txtCON); txtCONmod = findViewById(R.id.txtCONmod);
+        txtINT = findViewById(R.id.txtINT); txtINTmod = findViewById(R.id.txtINTmod);
+        txtSAB = findViewById(R.id.txtSAB); txtSABmod = findViewById(R.id.txtSABmod);
+        txtCAR = findViewById(R.id.txtCAR); txtCARmod = findViewById(R.id.txtCARmod);
+        layoutAvatarPlaceholder = findViewById(R.id.layoutAvatarPlaceholder);
+
+        //Click en avatar placeholder → galería
         imgAvatar.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
             pickImageLauncher.launch("image/*");
         });
+        layoutAvatarPlaceholder.setOnClickListener(v ->
+                pickImageLauncher.launch("image/*"));
 
-        // Mostrar email del usuario en el nombre del personaje
-        if (!userEmail.isEmpty()) {
-            TextView txtNombre = findViewById(R.id.txtNombrePersonaje);
-            if (txtNombre != null) {
-                // Opcionalmente mostrar email parcial como "aventurero"
-                String apodo = userEmail.contains("@")
-                        ? userEmail.substring(0, userEmail.indexOf("@"))
-                        : userEmail;
-                // Solo si no está en blanco
-                if (!apodo.isEmpty()) {
-                    // Dejamos el nombre del personaje como está (Arannis) pero
-                    // guardamos en Firestore que este usuario visitó la app
-                    guardarSesionEnFirestore();
-                }
-            }
-        }
+        //Header "TU PERSONAJE" → CrearPersonajeActivity
+        View btnHeaderPersonaje = findViewById(R.id.btnHeaderPersonaje);
+        btnHeaderPersonaje.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                Intent i = new Intent(this, CrearPersonajeActivity.class);
+                i.putExtra(EXTRA_USER_EMAIL, userEmail);
+                crearPersonajeLauncher.launch(i);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }, 150);
+        });
+
+        //Tomo Arcano + "VER TODOS" → SpellListActivity
+        View btnTomo = findViewById(R.id.btnTomoArcano);
+        btnTomo.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
+            new Handler(Looper.getMainLooper()).postDelayed(() -> abrirGrimorio(), 150);
+        });
+
+        View txtVerTodos = findViewById(R.id.txtVerTodosHechizos);
+        txtVerTodos.setOnClickListener(v -> abrirGrimorio());
 
         //Cargar misiones desde Firestore
         cargarMisionesDesdeFirestore();
 
-        // Hechizos con URL de imágenes
-        agregarSpell(new SpellData(
-                "Descarga de Escarcha", "TRUCO", "Conjuración",
-                "Acción", "60 pies", "1 criatura", "Instantáneo", false, false,
-                "Lanzas un rayo de frío contra una criatura. Realiza un ataque de hechizo a distancia. Si impacta, inflige 1d8 de daño de frío y la velocidad del objetivo se reduce en 10 pies hasta el inicio de tu siguiente turno.\n\nEl daño aumenta en 1d8 cuando alcanzas nivel 5 (2d8), nivel 11 (3d8) y nivel 17 (4d8).",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/frostbolt.png"
-        ));
-        agregarSpell(new SpellData(
-                "Mano Mágica", "TRUCO", "Conjuración",
-                "Acción", "30 pies", "Un objeto", "1 minuto", false, false,
-                "Una mano espectral flotante aparece en un punto elegido. Puede recoger o manipular objetos, abrir puertas, depositar objetos y usar herramientas sencillas.\n\nNo puede atacar, activar objetos mágicos ni cargar más de 10 libras.",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/magehand.png"
-        ));
-        agregarSpell(new SpellData(
-                "Escudo", "NIVEL 1", "Abjuración",
-                "Reacción", "Personal", "Tú mismo", "1 ronda", false, false,
-                "Una barrera invisible de fuerza mágica aparece para protegerte. Se activa cuando eres atacado o cuando una criatura te lanza Proyectil Mágico.\n\n+5 a la CA hasta el inicio de tu siguiente turno. Eres inmune a Proyectil Mágico este turno.",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/shield.png"
-        ));
-        agregarSpell(new SpellData(
-                "Misiles Mágicos", "NIVEL 1", "Evocación",
-                "Acción", "120 pies", "Una o más criaturas", "Instantáneo", false, false,
-                "Creas tres dardos brillantes de fuerza mágica que impactan automáticamente. Cada dardo inflige 1d4+1 de daño de fuerza.\n\nEn niveles superiores: el hechizo crea un dardo adicional por cada nivel por encima del 1.",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/magicmissil.png"
-        ));
-        agregarSpell(new SpellData(
-                "Armadura de Magia", "NIVEL 2", "Abjuración",
-                "Acción", "Toque", "Una criatura dispuesta", "8 horas", false, false,
-                "Tocas a una criatura dispuesta y la envuelves en protección mágica. Su CA se convierte en 13 + modificador de Destreza.\n\nEl hechizo finaliza si el objetivo equipa armadura.",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/magearmor.png"
-        ));
-        agregarSpell(new SpellData(
-                "Bola de Fuego", "NIVEL 3", "Evocación",
-                "Acción", "150 pies", "Esfera 20 pies", "Instantáneo", true, false,
-                "Un destello brillante explota en un punto elegido. Cada criatura en el área realiza salvación de Destreza CD 14.\n\nFalla: 8d6 daño de fuego.\nÉxito: mitad del daño.\n\nEn niveles superiores: +1d6 por cada nivel por encima del 3.",
-                "https://fecpedqshkgkbxxukbeg.supabase.co/storage/v1/object/public/Spells/fireball.png"
-        ));
+        //Hechizos fijos (con imagen personalizada de Supabase)
+        for (SpellModel spell : SpellModel.getHechizosFijos()) {
+            agregarSpell(spell);
+        }
 
+        //Dados
         configurarBtnDado(R.id.btnD4,  4);
         configurarBtnDado(R.id.btnD6,  6);
         configurarBtnDado(R.id.btnD8,  8);
@@ -169,44 +186,101 @@ public class MainActivity extends AppCompatActivity {
         configurarBtnDado(R.id.btnD12, 12);
         configurarBtnDado(R.id.btnD20, 20);
 
-        View btnAleatorio = findViewById(R.id.btnAleatorio);
-        btnAleatorio.setOnClickListener(v -> {
+        findViewById(R.id.btnAleatorio).setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
             int[] dados = {4, 6, 8, 10, 12, 20};
             tirarConAnimacion(dados[random.nextInt(dados.length)]);
         });
 
-        View btnHistorial = findViewById(R.id.btnHistorial);
-        btnHistorial.setOnClickListener(v -> {
+        findViewById(R.id.btnHistorial).setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
             new Handler(Looper.getMainLooper()).postDelayed(this::mostrarHistorial, 150);
         });
 
-        View btnAgregar = findViewById(R.id.btnAgregar);
-        btnAgregar.setOnClickListener(v -> {
+        //Nueva misión
+        findViewById(R.id.btnAgregar).setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
             contador++;
-            agregarMisionDisponible("Nueva misión " + contador, "Una misión misteriosa te aguarda.", "50 XP");
+            agregarMisionDisponible("Nueva misión " + contador,
+                    "Una misión misteriosa te aguarda.", "50 XP");
         });
 
         configurarMenu();
+
+        // Guardar sesión en Firestore si hay usuario logueado
+        if (!userEmail.isEmpty()) guardarSesionEnFirestore();
     }
 
-    // Firebase: guardar sesión
+    //Aplicar datos de personaje creado
+    private void aplicarDatosPersonaje(String nombre, String raza, String clase, int nivel,
+                                       String alineacion, int fue, int des, int con,
+                                       int intVal, int sab, int car) {
+        if (nombre != null) {
+            txtNombrePersonaje.setText(nombre);
+            txtNombrePersonaje.setTextColor(color(R.color.texto));
+        }
+        if (raza != null) {
+            txtRazaPersonaje.setText(raza);
+            txtRazaPersonaje.setTextColor(color(R.color.texto_secundario));
+        }
+        if (clase != null) {
+            txtClasePersonaje.setText(clase + " Nivel " + nivel);
+            txtClasePersonaje.setTextColor(color(R.color.texto_secundario));
+        }
+        if (alineacion != null) {
+            txtAlineacionPersonaje.setText(alineacion);
+            txtAlineacionPersonaje.setTextColor(color(R.color.texto_secundario));
+        }
+
+        txtNivelStat.setText(String.valueOf(nivel));
+        txtNivelStat.setTextColor(color(R.color.texto));
+
+        // CA estimada (10 + mod DES) y PG estimados (nivel * 6)
+        int modDes = (des - 10) / 2;
+        txtCA.setText(String.valueOf(10 + modDes));
+        txtCA.setTextColor(color(R.color.texto));
+        txtPG.setText(String.valueOf(nivel * 6));
+        txtPG.setTextColor(color(R.color.texto));
+
+        // Atributos
+        setAtributo(txtFUE, txtFUEmod, fue);
+        setAtributo(txtDES, txtDESmod, des);
+        setAtributo(txtCON, txtCONmod, con);
+        setAtributo(txtINT, txtINTmod, intVal);
+        setAtributo(txtSAB, txtSABmod, sab);
+        setAtributo(txtCAR, txtCARmod, car);
+
+        // Ocultar placeholder
+        txtPersonajePlaceholder.setVisibility(View.GONE);
+    }
+
+    private void setAtributo(TextView txtVal, TextView txtMod, int valor) {
+        txtVal.setText(String.valueOf(valor));
+        txtVal.setTextColor(color(R.color.texto));
+        int mod = (valor - 10) / 2;
+        txtMod.setText(mod >= 0 ? "(+" + mod + ")" : "(" + mod + ")");
+    }
+
+    //Abrir grimorio de hechizos
+    private void abrirGrimorio() {
+        Intent i = new Intent(this, SpellListActivity.class);
+        i.putExtra(EXTRA_USER_EMAIL, userEmail);
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    //Firebase
     private void guardarSesionEnFirestore() {
         if (mAuth.getCurrentUser() == null) return;
         String uid = mAuth.getCurrentUser().getUid();
         Map<String, Object> datos = new HashMap<>();
         datos.put("email", userEmail);
         datos.put("ultimaConexion", com.google.firebase.Timestamp.now());
-        datos.put("personaje", "Arannis");
         db.collection("usuarios").document(uid).set(datos);
     }
 
-    // Firebase: cargar misiones desde Firestore
     private void cargarMisionesDesdeFirestore() {
         if (mAuth.getCurrentUser() == null) {
-            // Sin login, cargamos misiones por defecto
             cargarMisionesDefault();
             return;
         }
@@ -216,17 +290,18 @@ public class MainActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
-                        // Primera vez: cargamos misiones default y las guardamos
                         cargarMisionesDefault();
                         guardarMisionesDefault(uid);
                     } else {
-                        // Cargar desde Firestore
-                        for (com.google.firebase.firestore.DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc
+                                : querySnapshot.getDocuments()) {
                             String nombre      = doc.getString("nombre");
                             String descripcion = doc.getString("descripcion");
                             String recompensa  = doc.getString("recompensa");
                             if (nombre != null)
-                                agregarMisionDisponible(nombre, descripcion != null ? descripcion : "", recompensa != null ? recompensa : "");
+                                agregarMisionDisponible(nombre,
+                                        descripcion != null ? descripcion : "",
+                                        recompensa  != null ? recompensa  : "");
                         }
                     }
                 })
@@ -247,128 +322,96 @@ public class MainActivity extends AppCompatActivity {
         };
         for (String[] m : misiones) {
             Map<String, Object> data = new HashMap<>();
-            data.put("nombre", m[0]);
-            data.put("descripcion", m[1]);
-            data.put("recompensa", m[2]);
-            db.collection("usuarios").document(uid)
-                    .collection("misiones").add(data);
+            data.put("nombre", m[0]); data.put("descripcion", m[1]); data.put("recompensa", m[2]);
+            db.collection("usuarios").document(uid).collection("misiones").add(data);
         }
     }
 
-    // Navegar a DetalleHechizo con extras
-    private void abrirDetalleHechizo(SpellData spell) {
+    //Hechizos
+    private void agregarSpell(SpellModel spell) {
+        LinearLayout item = new LinearLayout(this);
+        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setPadding(0, dp(6), 0, dp(6));
+        item.setGravity(Gravity.CENTER_VERTICAL);
+        item.setClickable(true);
+        item.setFocusable(true);
+        item.setBackground(getDrawable(android.R.drawable.list_selector_background));
+
+        int[] badgeColors = getBadgeColors(spell.levelInt);
+        TextView badgeView = new TextView(this);
+        badgeView.setText(spell.getBadgeLabel());
+        badgeView.setTextColor(badgeColors[1]);
+        badgeView.setTextSize(9);
+        badgeView.setPadding(dp(8), dp(4), dp(8), dp(4));
+        badgeView.setBackgroundColor(badgeColors[0]);
+        LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        bLp.setMargins(0, 0, dp(10), 0);
+        badgeView.setLayoutParams(bLp);
+
+        TextView txtNombreSpell = txt(spell.name, 13, R.color.texto, false);
+        txtNombreSpell.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        TextView arrow = txt("›", 16, R.color.dorado_borde, false);
+
+        item.addView(badgeView);
+        item.addView(txtNombreSpell);
+        item.addView(arrow);
+
+        item.setOnClickListener(v -> {
+            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> abrirDetalleHechizo(spell), 150);
+        });
+
+        layoutSpells.addView(item);
+    }
+
+    private void abrirDetalleHechizo(SpellModel spell) {
         Intent intent = new Intent(this, DetalleHechizo.class);
-        intent.putExtra(DetalleHechizo.EXTRA_NOMBRE,        spell.nombre);
-        intent.putExtra(DetalleHechizo.EXTRA_NIVEL,         spell.nivel);
-        intent.putExtra(DetalleHechizo.EXTRA_ESCUELA,       spell.escuela);
-        intent.putExtra(DetalleHechizo.EXTRA_TIEMPO,        spell.tiempo);
-        intent.putExtra(DetalleHechizo.EXTRA_ALCANCE,       spell.alcance);
-        intent.putExtra(DetalleHechizo.EXTRA_OBJETIVO,      spell.objetivo);
-        intent.putExtra(DetalleHechizo.EXTRA_DURACION,      spell.duracion);
-        intent.putExtra(DetalleHechizo.EXTRA_CONCENTRACION, spell.concentracion);
-        intent.putExtra(DetalleHechizo.EXTRA_RITUAL,        spell.ritual);
-        intent.putExtra(DetalleHechizo.EXTRA_DESCRIPCION,   spell.descripcion);
-        intent.putExtra(DetalleHechizo.EXTRA_IMAGEN_URL,    spell.imagenUrl);
+        intent.putExtra(DetalleHechizo.EXTRA_SLUG,         spell.slug);
+        intent.putExtra(DetalleHechizo.EXTRA_NAME,         spell.name);
+        intent.putExtra(DetalleHechizo.EXTRA_DESC,         spell.desc);
+        intent.putExtra(DetalleHechizo.EXTRA_HIGHER_LEVEL, spell.higherLevel);
+        intent.putExtra(DetalleHechizo.EXTRA_RANGE,        spell.range);
+        intent.putExtra(DetalleHechizo.EXTRA_COMPONENTS,   spell.components);
+        intent.putExtra(DetalleHechizo.EXTRA_MATERIAL,     spell.material);
+        intent.putExtra(DetalleHechizo.EXTRA_CASTING_TIME, spell.castingTime);
+        intent.putExtra(DetalleHechizo.EXTRA_LEVEL,        spell.level);
+        intent.putExtra(DetalleHechizo.EXTRA_LEVEL_INT,    spell.levelInt);
+        intent.putExtra(DetalleHechizo.EXTRA_SCHOOL,       spell.school);
+        intent.putExtra(DetalleHechizo.EXTRA_DURATION,     spell.duration);
+        intent.putExtra(DetalleHechizo.EXTRA_CONCENTRATION,spell.requiresConcentration);
+        intent.putExtra(DetalleHechizo.EXTRA_RITUAL,       spell.canBeCastAsRitual);
+        intent.putExtra(DetalleHechizo.EXTRA_DND_CLASS,    spell.dndClass);
+        intent.putExtra(DetalleHechizo.EXTRA_IMAGEN_URL,   spell.imagenUrl);
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    // Pulsar botón con animación
-    private void pulsarYEjecutar(View v, Runnable accion) {
-        Animation anim = AnimationUtils.loadAnimation(this, R.anim.btn_press);
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            @Override public void onAnimationStart(Animation a) {}
-            @Override public void onAnimationRepeat(Animation a) {}
-            @Override public void onAnimationEnd(Animation a) { accion.run(); }
-        });
-        v.startAnimation(anim);
-    }
-
-    // Dado
-    private void configurarBtnDado(int btnId, int caras) {
-        View btn = findViewById(btnId);
-        btn.setOnClickListener(v -> {
-            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> tirarConAnimacion(caras), 100);
-        });
-    }
-
-    private void tirarConAnimacion(int caras) {
-        int resultado = random.nextInt(caras) + 1;
-        final int DURACION_RULETA = 700;
-        final int INTERVALO = 80;
-        final int FLASHES = DURACION_RULETA / INTERVALO;
-        txtResultado.setText("?");
-        txtTipoDado.setText("d" + caras);
-
-        ObjectAnimator rotAnim = ObjectAnimator.ofFloat(txtResultado, "rotation", 0f, 360f);
-        rotAnim.setDuration(DURACION_RULETA);
-        rotAnim.start();
-
-        final Handler handler = new Handler(Looper.getMainLooper());
-        for (int i = 0; i < FLASHES; i++) {
-            final int idx = i;
-            handler.postDelayed(() -> {
-                txtResultado.setText(String.valueOf(random.nextInt(caras) + 1));
-                txtResultado.setTextColor(idx % 2 == 0 ? color(R.color.dorado) : color(R.color.texto));
-            }, idx * INTERVALO);
+    private int[] getBadgeColors(int levelInt) {
+        switch (levelInt) {
+            case 0:  return new int[]{color(R.color.badge_truco),  color(R.color.badge_truco_texto)};
+            case 1:  return new int[]{color(R.color.badge_nivel1), color(R.color.badge_nivel1_texto)};
+            case 2:  return new int[]{color(R.color.badge_nivel2), color(R.color.badge_nivel2_texto)};
+            default: return new int[]{color(R.color.badge_nivel3), color(R.color.badge_nivel3_texto)};
         }
-
-        handler.postDelayed(() -> {
-            historial.add(0, "d" + caras + "|" + resultado);
-            if (historial.size() > 20) historial.remove(historial.size() - 1);
-
-            int colorFinal;
-            String textoTipo;
-            if (caras == 20 && resultado == 1) {
-                colorFinal = Color.parseColor("#C05050");
-                textoTipo = "(d" + caras + ")  💀";
-            } else if (caras == 20 && resultado == 20) {
-                colorFinal = color(R.color.dorado);
-                textoTipo = "(d20)  ✦";
-            } else {
-                colorFinal = color(R.color.dorado);
-                textoTipo = "(d" + caras + ")";
-            }
-
-            txtResultado.setText(String.valueOf(resultado));
-            txtResultado.setTextColor(colorFinal);
-            txtTipoDado.setText(textoTipo);
-
-            ObjectAnimator scaleX = ObjectAnimator.ofFloat(txtResultado, "scaleX", 0.3f, 1.15f, 1.0f);
-            ObjectAnimator scaleY = ObjectAnimator.ofFloat(txtResultado, "scaleY", 0.3f, 1.15f, 1.0f);
-            scaleX.setDuration(400);
-            scaleY.setDuration(400);
-            scaleX.setInterpolator(new OvershootInterpolator(2.5f));
-            scaleY.setInterpolator(new OvershootInterpolator(2.5f));
-            scaleX.start();
-            scaleY.start();
-
-            if (caras == 20 && resultado == 20) {
-                ObjectAnimator pulso = ObjectAnimator.ofFloat(txtResultado, "alpha", 1f, 0.3f, 1f);
-                pulso.setDuration(300);
-                pulso.setRepeatCount(3);
-                pulso.setStartDelay(400);
-                pulso.start();
-            }
-        }, DURACION_RULETA + 50);
     }
 
-    // Misiones
-    private void aceptarMisionConAnimacion(String nombre, String recompensa, LinearLayout wrapper) {
+    //Misiones
+    private void aceptarMisionConAnimacion(String nombre, String recompensa,
+                                           LinearLayout wrapper) {
         if (wrapper.getParent() == null) return;
         if (Boolean.TRUE.equals(wrapper.getTag())) return;
         wrapper.setTag(true);
 
         wrapper.animate()
-                .alpha(0f)
-                .translationX(200f)
-                .setDuration(250)
+                .alpha(0f).translationX(200f).setDuration(250)
                 .withEndAction(() -> {
                     wrapper.clearAnimation();
                     wrapper.post(() -> {
-                        if (wrapper.getParent() != null) layoutDisponibles.removeView(wrapper);
+                        if (wrapper.getParent() != null)
+                            layoutDisponibles.removeView(wrapper);
                         if (layoutDisponibles.getChildCount() > 0) {
                             View primerChild = layoutDisponibles.getChildAt(0);
                             if (primerChild instanceof LinearLayout) {
@@ -381,8 +424,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         agregarMisionActivaAnimada(nombre, recompensa);
                     });
-                })
-                .start();
+                }).start();
     }
 
     private void agregarMisionActivaAnimada(String nombre, String recompensa) {
@@ -401,15 +443,15 @@ public class MainActivity extends AppCompatActivity {
         item.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView icono = new TextView(this);
-        icono.setText("⚔️");
-        icono.setTextSize(22);
+        icono.setText("⚔️"); icono.setTextSize(22);
         icono.setPadding(0, 0, dp(10), 0);
         icono.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
         LinearLayout info = new LinearLayout(this);
         info.setOrientation(LinearLayout.VERTICAL);
-        info.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        info.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
         info.addView(txt(nombre, 13, R.color.texto, true));
         info.addView(txt("Recompensa:  " + recompensa, 11, R.color.dorado_claro, false));
 
@@ -420,40 +462,86 @@ public class MainActivity extends AppCompatActivity {
         badge.setPadding(dp(8), dp(4), dp(8), dp(4));
         badge.setBackgroundColor(color(R.color.boton_bg));
 
-        item.addView(icono);
-        item.addView(info);
-        item.addView(badge);
+        item.addView(icono); item.addView(info); item.addView(badge);
         return item;
     }
 
-    // Menú
-    private void configurarMenu() {
-        View menuInicio = findViewById(R.id.menuInicio);
-        menuInicio.setOnClickListener(v ->
-                v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press)));
+    private void agregarMisionDisponible(String nombre, String descripcion, String recompensa) {
+        LinearLayout wrapper = new LinearLayout(this);
+        wrapper.setOrientation(LinearLayout.VERTICAL);
 
-        View menuInventario = findViewById(R.id.menuInventario);
-        menuInventario.setOnClickListener(v -> pulsarYEjecutar(v, () -> {
-            Intent i = new Intent(this, InventarioActivity.class);
-            i.putExtra(EXTRA_USER_EMAIL, userEmail);
-            startActivity(i);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }));
+        if (layoutDisponibles.getChildCount() > 0) {
+            View sep = new View(this);
+            sep.setTag("sep");
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
+            lp.setMargins(0, dp(3), 0, dp(3));
+            sep.setLayoutParams(lp);
+            sep.setBackgroundColor(color(R.color.borde));
+            wrapper.addView(sep);
+        }
 
-        View menuNotas = findViewById(R.id.menuNotas);
-        menuNotas.setOnClickListener(v -> pulsarYEjecutar(v, () -> {
-            Intent i = new Intent(this, NotasActivity.class);
-            i.putExtra(EXTRA_USER_EMAIL, userEmail);
-            startActivity(i);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }));
+        LinearLayout item = new LinearLayout(this);
+        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setPadding(0, dp(10), 0, dp(10));
+        item.setGravity(Gravity.CENTER_VERTICAL);
+        item.setTag(wrapper);
 
-        View menuAjustes = findViewById(R.id.menuAjustes);
-        menuAjustes.setOnClickListener(v -> pulsarYEjecutar(v, () ->
-                mostrarDialogoAjustes()));
+        TextView icono = new TextView(this);
+        icono.setText("📜"); icono.setTextSize(22);
+        icono.setPadding(0, 0, dp(10), 0);
+
+        LinearLayout info = new LinearLayout(this);
+        info.setOrientation(LinearLayout.VERTICAL);
+        info.setLayoutParams(new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        info.addView(txt(nombre, 13, R.color.texto, true));
+        info.addView(txt(descripcion, 11, R.color.texto_secundario, false));
+        info.addView(txt("Recompensa:  " + recompensa, 11, R.color.dorado_claro, false));
+
+        androidx.appcompat.widget.AppCompatButton btn =
+                new androidx.appcompat.widget.AppCompatButton(this);
+        btn.setText("ACEPTAR");
+        btn.setTextSize(10);
+        btn.setTextColor(color(R.color.dorado));
+        btn.setBackgroundColor(color(R.color.boton_bg));
+        btn.setOnClickListener(v -> {
+            btn.setEnabled(false);
+            btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> aceptarMisionConAnimacion(nombre, recompensa, wrapper), 120);
+        });
+
+        item.addView(icono); item.addView(info); item.addView(btn);
+        wrapper.addView(item);
+        layoutDisponibles.addView(wrapper);
     }
 
-    // Diálogo de ajustes con opción de cerrar sesión
+    //Menú
+    private void configurarMenu() {
+        findViewById(R.id.menuInicio).setOnClickListener(v ->
+                v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press)));
+
+        findViewById(R.id.menuInventario).setOnClickListener(v ->
+                pulsarYEjecutar(v, () -> {
+                    Intent i = new Intent(this, InventarioActivity.class);
+                    i.putExtra(EXTRA_USER_EMAIL, userEmail);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }));
+
+        findViewById(R.id.menuNotas).setOnClickListener(v ->
+                pulsarYEjecutar(v, () -> {
+                    Intent i = new Intent(this, NotasActivity.class);
+                    i.putExtra(EXTRA_USER_EMAIL, userEmail);
+                    startActivity(i);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }));
+
+        findViewById(R.id.menuAjustes).setOnClickListener(v ->
+                pulsarYEjecutar(v, this::mostrarDialogoAjustes));
+    }
+
     private void mostrarDialogoAjustes() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -466,32 +554,29 @@ public class MainActivity extends AppCompatActivity {
         root.addView(t);
         root.addView(separadorDorado());
 
-        // Mostrar email del usuario
         if (!userEmail.isEmpty()) {
             TextView tvEmail = new TextView(this);
             tvEmail.setText("Sesión iniciada como:\n" + userEmail);
             tvEmail.setTextColor(color(R.color.texto_secundario));
             tvEmail.setTextSize(12);
             tvEmail.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams emailLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            emailLp.setMargins(0, dp(12), 0, dp(4));
-            tvEmail.setLayoutParams(emailLp);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, dp(12), 0, dp(4));
+            tvEmail.setLayoutParams(lp);
             root.addView(tvEmail);
         }
 
-        TextView m = txt("⚙️  Más ajustes estarán\ndisponibles en la próxima versión.", 13, R.color.texto, false);
+        TextView m = txt("⚙️  Más ajustes estarán\ndisponibles en la próxima versión.",
+                13, R.color.texto, false);
         m.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams mLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         mLp.setMargins(0, dp(8), 0, dp(12));
         m.setLayoutParams(mLp);
         root.addView(m);
-
         root.addView(separadorDorado());
 
-        // Botón cerrar sesión
         Button btnCerrar = new Button(this);
         btnCerrar.setText("⚔  CERRAR SESIÓN");
         btnCerrar.setTextColor(0xFFE53935);
@@ -502,17 +587,15 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(42));
         cLp.setMargins(0, dp(10), 0, dp(6));
         btnCerrar.setLayoutParams(cLp);
+        root.addView(btnCerrar);
 
         Button btnOk = new Button(this);
         btnOk.setText("ACEPTAR");
         btnOk.setTextColor(color(R.color.dorado));
         btnOk.setBackgroundTintList(
                 android.content.res.ColorStateList.valueOf(color(R.color.boton_bg)));
-        LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(42));
-        btnOk.setLayoutParams(bLp);
-
-        root.addView(btnCerrar);
+        btnOk.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(42)));
         root.addView(btnOk);
 
         AlertDialog d = new AlertDialog.Builder(this, R.style.DialogoOscuro)
@@ -529,11 +612,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
-
         d.show();
     }
 
-    // Historial
+    //Historial de dados
     private void mostrarHistorial() {
         LinearLayout raiz = new LinearLayout(this);
         raiz.setOrientation(LinearLayout.VERTICAL);
@@ -548,13 +630,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout filaTitulo = new LinearLayout(this);
         filaTitulo.setOrientation(LinearLayout.HORIZONTAL);
         filaTitulo.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView e1 = txt("✦", 14, R.color.dorado, false);
-        e1.setPadding(0, 0, dp(8), 0);
+        TextView e1 = txt("✦", 14, R.color.dorado, false); e1.setPadding(0, 0, dp(8), 0);
         TextView titulo = txt("HISTORIAL DE TIRADAS", 14, R.color.dorado, true);
         titulo.setTypeface(Typeface.create("serif", Typeface.BOLD));
-        TextView e2 = txt("✦", 14, R.color.dorado, false);
-        e2.setPadding(dp(8), 0, 0, 0);
+        TextView e2 = txt("✦", 14, R.color.dorado, false); e2.setPadding(dp(8), 0, 0, 0);
         filaTitulo.addView(e1); filaTitulo.addView(titulo); filaTitulo.addView(e2);
         encabezado.addView(filaTitulo);
 
@@ -663,7 +742,8 @@ public class MainActivity extends AppCompatActivity {
         cerrar.setTextColor(color(R.color.dorado));
         cerrar.setTextSize(12);
         cerrar.setTypeface(Typeface.create("serif", Typeface.BOLD));
-        cerrar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color(R.color.boton_bg)));
+        cerrar.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(color(R.color.boton_bg)));
         LinearLayout.LayoutParams cerrarLp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(44));
         cerrarLp.setMargins(dp(16), dp(10), dp(16), dp(16));
@@ -681,156 +761,101 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    // Hechizos
-    private void agregarSpell(SpellData spell) {
-        LinearLayout item = new LinearLayout(this);
-        item.setOrientation(LinearLayout.HORIZONTAL);
-        item.setPadding(0, dp(6), 0, dp(6));
-        item.setGravity(Gravity.CENTER_VERTICAL);
-        item.setClickable(true);
-        item.setFocusable(true);
-        item.setBackground(getDrawable(android.R.drawable.list_selector_background));
-
-        int[] badgeColors = getBadgeColors(spell.nivel);
-
-        TextView badgeView = new TextView(this);
-        badgeView.setText(spell.nivel);
-        badgeView.setTextColor(badgeColors[1]);
-        badgeView.setTextSize(9);
-        badgeView.setPadding(dp(8), dp(4), dp(8), dp(4));
-        badgeView.setBackgroundColor(badgeColors[0]);
-        LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        bLp.setMargins(0, 0, dp(10), 0);
-        badgeView.setLayoutParams(bLp);
-
-        TextView txtNombre = txt(spell.nombre, 13, R.color.texto, false);
-        txtNombre.setLayoutParams(new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        TextView arrow = txt("›", 16, R.color.dorado_borde, false);
-
-        item.addView(badgeView);
-        item.addView(txtNombre);
-        item.addView(arrow);
-
-        // Al hacer clic → Intent con extras a DetalleHechizo
-        item.setOnClickListener(v -> {
-            v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> abrirDetalleHechizo(spell), 150);
-        });
-
-        layoutSpells.addView(item);
-    }
-
-    private int[] getBadgeColors(String nivel) {
-        switch (nivel != null ? nivel : "") {
-            case "TRUCO":   return new int[]{color(R.color.badge_truco),  color(R.color.badge_truco_texto)};
-            case "NIVEL 1": return new int[]{color(R.color.badge_nivel1), color(R.color.badge_nivel1_texto)};
-            case "NIVEL 2": return new int[]{color(R.color.badge_nivel2), color(R.color.badge_nivel2_texto)};
-            default:        return new int[]{color(R.color.badge_nivel3), color(R.color.badge_nivel3_texto)};
-        }
-    }
-
-    // Misión disponible
-    private void agregarMisionDisponible(String nombre, String descripcion, String recompensa) {
-        LinearLayout wrapper = new LinearLayout(this);
-        wrapper.setOrientation(LinearLayout.VERTICAL);
-
-        if (layoutDisponibles.getChildCount() > 0) {
-            View sep = new View(this);
-            sep.setTag("sep");
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, 1);
-            lp.setMargins(0, dp(3), 0, dp(3));
-            sep.setLayoutParams(lp);
-            sep.setBackgroundColor(color(R.color.borde));
-            wrapper.addView(sep);
-        }
-
-        LinearLayout item = new LinearLayout(this);
-        item.setOrientation(LinearLayout.HORIZONTAL);
-        item.setPadding(0, dp(10), 0, dp(10));
-        item.setGravity(Gravity.CENTER_VERTICAL);
-        item.setTag(wrapper);
-
-        TextView icono = new TextView(this);
-        icono.setText("📜");
-        icono.setTextSize(22);
-        icono.setPadding(0, 0, dp(10), 0);
-
-        LinearLayout info = new LinearLayout(this);
-        info.setOrientation(LinearLayout.VERTICAL);
-        info.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        info.addView(txt(nombre, 13, R.color.texto, true));
-        info.addView(txt(descripcion, 11, R.color.texto_secundario, false));
-        info.addView(txt("Recompensa:  " + recompensa, 11, R.color.dorado_claro, false));
-
-        androidx.appcompat.widget.AppCompatButton btn =
-                new androidx.appcompat.widget.AppCompatButton(this);
-        btn.setText("ACEPTAR");
-        btn.setTextSize(10);
-        btn.setTextColor(color(R.color.dorado));
-        btn.setBackgroundColor(color(R.color.boton_bg));
-
+    //Dado con animación
+    private void configurarBtnDado(int btnId, int caras) {
+        View btn = findViewById(btnId);
         btn.setOnClickListener(v -> {
-            btn.setEnabled(false);
-            btn.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> aceptarMisionConAnimacion(nombre, recompensa, wrapper), 120);
-        });
-
-        item.addView(icono);
-        item.addView(info);
-        item.addView(btn);
-        wrapper.addView(item);
-        layoutDisponibles.addView(wrapper);
-    }
-
-    // Diálogo estético genérico
-    private void mostrarDialogoEstetico(String titulo, String mensaje) {
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundResource(R.drawable.seccion_bg);
-        root.setPadding(dp(20), dp(20), dp(20), dp(20));
-
-        TextView t = txt("✦  " + titulo.toUpperCase() + "  ✦", 14, R.color.dorado, true);
-        t.setTypeface(Typeface.create("serif", Typeface.BOLD));
-        t.setGravity(Gravity.CENTER);
-        root.addView(t);
-        root.addView(separadorDorado());
-
-        TextView m = txt(mensaje, 13, R.color.texto, false);
-        m.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams mLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        mLp.setMargins(0, dp(12), 0, dp(12));
-        m.setLayoutParams(mLp);
-        root.addView(m);
-        root.addView(separadorDorado());
-
-        Button b = new Button(this);
-        b.setText("ACEPTAR");
-        b.setTextColor(color(R.color.dorado));
-        b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(color(R.color.boton_bg)));
-        LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(42));
-        bLp.setMargins(0, dp(12), 0, 0);
-        b.setLayoutParams(bLp);
-        root.addView(b);
-
-        AlertDialog d = new AlertDialog.Builder(this, R.style.DialogoOscuro)
-                .setView(root).create();
-        if (d.getWindow() != null)
-            d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        b.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, R.anim.btn_press));
-            new Handler(Looper.getMainLooper()).postDelayed(d::dismiss, 150);
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> tirarConAnimacion(caras), 100);
         });
-        d.show();
     }
 
-    // Utilities
+    private void tirarConAnimacion(int caras) {
+        int resultado = random.nextInt(caras) + 1;
+        final int DURACION = 700, INTERVALO = 80, FLASHES = DURACION / INTERVALO;
+        txtResultado.setText("?");
+        txtTipoDado.setText("d" + caras);
+
+        ObjectAnimator rotAnim = ObjectAnimator.ofFloat(txtResultado, "rotation", 0f, 360f);
+        rotAnim.setDuration(DURACION);
+        rotAnim.start();
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        for (int i = 0; i < FLASHES; i++) {
+            final int idx = i;
+            handler.postDelayed(() -> {
+                txtResultado.setText(String.valueOf(random.nextInt(caras) + 1));
+                txtResultado.setTextColor(idx % 2 == 0
+                        ? color(R.color.dorado) : color(R.color.texto));
+            }, idx * INTERVALO);
+        }
+
+        handler.postDelayed(() -> {
+            historial.add(0, "d" + caras + "|" + resultado);
+            if (historial.size() > 20) historial.remove(historial.size() - 1);
+
+            int colorFinal;
+            String textoTipo;
+            if (caras == 20 && resultado == 1) {
+                colorFinal = Color.parseColor("#C05050");
+                textoTipo = "(d20)  💀";
+            } else if (caras == 20 && resultado == 20) {
+                colorFinal = color(R.color.dorado);
+                textoTipo = "(d20)  ✦";
+            } else {
+                colorFinal = color(R.color.dorado);
+                textoTipo = "(d" + caras + ")";
+            }
+
+            txtResultado.setText(String.valueOf(resultado));
+            txtResultado.setTextColor(colorFinal);
+            txtTipoDado.setText(textoTipo);
+
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(txtResultado, "scaleX", 0.3f, 1.15f, 1.0f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(txtResultado, "scaleY", 0.3f, 1.15f, 1.0f);
+            scaleX.setDuration(400); scaleY.setDuration(400);
+            scaleX.setInterpolator(new OvershootInterpolator(2.5f));
+            scaleY.setInterpolator(new OvershootInterpolator(2.5f));
+            scaleX.start(); scaleY.start();
+
+            if (caras == 20 && resultado == 20) {
+                ObjectAnimator pulso = ObjectAnimator.ofFloat(txtResultado, "alpha", 1f, 0.3f, 1f);
+                pulso.setDuration(300); pulso.setRepeatCount(3); pulso.setStartDelay(400);
+                pulso.start();
+            }
+        }, DURACION + 50);
+    }
+
+    //Utilities
+    private void pulsarYEjecutar(View v, Runnable accion) {
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.btn_press);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override public void onAnimationStart(Animation a) {}
+            @Override public void onAnimationRepeat(Animation a) {}
+            @Override public void onAnimationEnd(Animation a) { accion.run(); }
+        });
+        v.startAnimation(anim);
+    }
+
+    private void agregarSeparador(LinearLayout parent) {
+        View sep = new View(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1);
+        lp.setMargins(0, dp(3), 0, dp(3));
+        sep.setLayoutParams(lp);
+        sep.setBackgroundColor(color(R.color.borde));
+        parent.addView(sep);
+    }
+
+    private View separadorDorado() {
+        View v = new View(this);
+        v.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        v.setBackgroundColor(color(R.color.dorado_borde));
+        return v;
+    }
+
     private int dp(int val) {
         return Math.round(val * getResources().getDisplayMetrics().density);
     }
@@ -848,51 +873,5 @@ public class MainActivity extends AppCompatActivity {
         tv.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         return tv;
-    }
-
-    private View separadorDorado() {
-        View v = new View(this);
-        v.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 1));
-        v.setBackgroundColor(color(R.color.dorado_borde));
-        return v;
-    }
-
-    private void agregarSeparador(LinearLayout parent) {
-        View sep = new View(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 1);
-        lp.setMargins(0, dp(3), 0, dp(3));
-        sep.setLayoutParams(lp);
-        sep.setBackgroundColor(color(R.color.borde));
-        parent.addView(sep);
-    }
-
-    private LinearLayout propCol(String etiqueta, String valor) {
-        LinearLayout col = new LinearLayout(this);
-        col.setOrientation(LinearLayout.VERTICAL);
-        col.setGravity(Gravity.CENTER);
-        col.setLayoutParams(new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        TextView et = txt(etiqueta, 7, R.color.dorado_claro, false);
-        et.setGravity(Gravity.CENTER);
-        et.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        TextView val = txt(valor, 10, R.color.texto, false);
-        val.setGravity(Gravity.CENTER);
-        val.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        col.addView(et); col.addView(val);
-        return col;
-    }
-
-    private View propSep() {
-        View v = new View(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(1),
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        lp.setMargins(0, dp(4), 0, dp(4));
-        v.setLayoutParams(lp);
-        v.setBackgroundColor(color(R.color.borde));
-        return v;
     }
 }
